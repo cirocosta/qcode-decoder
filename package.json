@@ -1,0 +1,31 @@
+{
+  "name": "qcode-js",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cirocosta/qcode-js.git"
+  },
+  "author": "Ciro S. Costa <ciro9758@gmail.com> (http://www.cirocosta.com.br/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cirocosta/qcode-js/issues"
+  },
+  "homepage": "https://github.com/cirocosta/qcode-js",
+  "devDependencies": {
+    "gulp": "^3.6.2",
+    "gulp-concat": "^2.2.0",
+    "gulp-uglify": "^0.3.0"
+  },
+  "dependencies": {
+    "bower": "^1.3.3"
+  }
+}
