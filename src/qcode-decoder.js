@@ -1,22 +1,38 @@
+/**
+ * Constructor for QRCodeDecoder
+ */
 function QRCodeDecoder () {
   this.tmrCapture = null;
   this.canvasElem = null;
 }
 
+/**
+ * Prepares the canvas element (which will receive the image from the
+ * camera and provide what the algorithm needs for checking for a
+ * QRCode and then decoding it.)
+ * @param  {DOMElement} canvasElem the canvas element
+ * @param  {number} width      The width that the canvas element
+ * should have
+ * @param  {number} height     The height that the canvas element
+ * should have
+ * @return {DOMElement}            the canvas after the resize if
+ * width and height provided.
+ */
 QRCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
-  canvasElem.style.width = width + "px";
-  canvasElem.style.height = height + "px";
-  canvasElem.width = width;
-  canvasElem.height = height;
+  if (width && height) {
+    canvasElem.style.width = width + "px";
+    canvasElem.style.height = height + "px";
+    canvasElem.width = width;
+    canvasElem.height = height;
+  }
 
   qrcode.setCanvasElement(canvasElem);
-
   this.canvasElem = canvasElem;
 
   return canvasElem;
 };
 
-QRCodeDecoder.prototype.captureToCanvas = function () {
+QRCodeDecoder.prototype._captureToCanvas = function () {
   var scope = this;
 
   if (this.tmrCapture) {
@@ -34,30 +50,42 @@ QRCodeDecoder.prototype.captureToCanvas = function () {
     catch(e){
       console.log(e);
       this.tmrCapture = setTimeout(function () {
-        scope.captureToCanvas.apply(scope, null);
+        scope._captureToCanvas.apply(scope, null);
       }, 500);
     }
   }
   catch(e){
       console.log(e);
       this.tmrCapture = setTimeout(function () {
-        scope.captureToCanvas.apply(scope, null);
+        scope._captureToCanvas.apply(scope, null);
       }, 500);
   }
 };
 
+/**
+ * Verifies if the user has getUserMedia enabled in the browser.
+ */
 QRCodeDecoder.prototype.hasGetUserMedia = function () {
   return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
             navigator.mozGetUserMedia || navigator.msGetUserMedia);
 };
 
+/**
+ * Verifies if canvas element is supported.
+ */
 QRCodeDecoder.prototype.isCanvasSupported = function () {
   var elem = document.createElement('canvas');
 
   return !!(elem.getContext && elem.getContext('2d'));
 };
 
-QRCodeDecoder.prototype.prepareVideo = function(videoElem) {
+/**
+ * Prepares the video element for receiving camera's input.
+ * @param  {DOMElement} videoElem <video> dom element
+ * @param  {Function} errcb     callback function to be called in case
+ *                              of error
+ */
+QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
   var scope = this;
 
   navigator.getUserMedia = navigator.getUserMedia ||
@@ -70,20 +98,21 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem) {
       videoElem.src = window.URL.createObjectURL(stream);
       scope.videoElem = videoElem;
       setTimeout(function () {
-        scope.captureToCanvas.apply(scope, null);
+        scope._captureToCanvas.apply(scope, null);
       }, 500);
-    }, function (err) {
-      console.log("An error occurred while getting video stream: ", err);
-    });
+    }, errcb);
   } else {
     console.log('Couldn\'t get video from camera');
   }
 
   setTimeout(function () {
-    scope.captureToCanvas.apply(scope, null);
+    scope._captureToCanvas.apply(scope, null);
   }, 500);
 };
 
+/**
+ * Sets the callback for the decode event
+ */
 QRCodeDecoder.prototype.setDecoderCallback = function (cb) {
   qrcode.callback = cb;
 };
