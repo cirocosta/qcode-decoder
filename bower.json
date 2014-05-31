@@ -1,7 +1,7 @@
 {
   "name": "qcode-decoder",
   "main": "build/main.min.js",
-  "description":"Decodes QRCode in the browser / node",
+  "description": "Decodes QRCode in the browser / node",
   "version": "0.0.1",
   "homepage": "https://github.com/cirocosta/qcode-decoder",
   "authors": [
@@ -14,6 +14,14 @@
     "bower_components",
     "test",
     "examples",
-    "vendor"
+    "vendor",
+    "tests"
+  ],
+  "keywords": [
+    "qrcode-decoder",
+    "qrcode",
+    "qrcode-browser",
+    "nodejs",
+    "html5"
   ]
 }
