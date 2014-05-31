@@ -2,7 +2,7 @@
 
 > Decodes QRCode in the browser / node
 
-## Quickuse
+## Using in your project
 
 Download it as a dependency
 
@@ -22,9 +22,13 @@ and use it!
 <!-- TODO -->
 ```
 
+## Testing
+
+For testing this module, run `npm run start-server` and then go to `http://localhost:8080/examples` for seing the sorcery :neckbeard:
+
 ## Credits
 
-The main decoder is from [Lazar Laszlo](http://www.
+The main decoder methods are from [Lazar Laszlo](http://www.
 lazarsoft.info/). Go check his work!
 
 ## LICENSE
