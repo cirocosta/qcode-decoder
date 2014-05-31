@@ -7,10 +7,24 @@
 
 	<canvas id="qr-canvas" width="800" height="600" style="display: none;"></canvas>
 	<video id="v" autoplay></video>
-	<button>reset</button>
+	<button>Reset</button>
 
-	<script src="../build/js/jsqrcode.min.js"></script>
-	<script src="../src/qr-code-decoder.js"></script>
-	<script src="index.js"></script>
+	<script src="../build/qcode-decoder.min.js"></script>
+	<script type="text/javascript">
+		var qr = new QRCodeDecoder();
+
+		if (qr.isCanvasSupported() || qr.hasGetUserMedia()) {
+		  qr.prepareCanvas(document.querySelector('canvas'), 800,600);
+		  qr.setDecoderCallback(function (a) {
+		    console.log(a);
+		  });
+		}
+
+		qr.prepareVideo(document.querySelector('video'));
+
+		document.querySelector('button').onclick = function () {
+		  qr.prepareVideo(document.querySelector('video'));
+		}
+	</script>
 </body>
 </html>

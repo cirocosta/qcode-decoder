@@ -1,4 +1,4 @@
-# qcode js!
+# qcode-decoder
 
 > Decodes QRCode in the browser / node
 
@@ -13,7 +13,7 @@ $ bower install qcode
 attach it to your html file
 
 ```html
-<script src="../bower_components/qcode-js/build/qcode.min.js"></script>
+<script src="../bower_components/qcode-decoder/build/qcode-decoder.min.js"></script>
 ```
 
 and use it!

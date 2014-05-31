@@ -3,12 +3,15 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+var jshint = require('gulp-jshint');
 var rimraf = require('rimraf');
 var _ = require('lodash');
 
 /**
  * Constants
  */
+
+var target = 'qcode-decoder.min.js';
 
 var paths = {
   scripts: ['src/**/*.js'],
@@ -19,7 +22,8 @@ var paths = {
              "databr.js"], function (file) {
               return 'vendor/' + file;
              }),
-  build: ['build/js/*.js']
+  build: ['build/js/*.js'],
+  tests: ['test/**/*.js']
 };
 
 var dirs = {
@@ -50,18 +54,29 @@ gulp.task('scripts', function() {
 });
 
 /**
+ * Hinting and testing
+ */
+
+gulp.task('hinting', function () {
+  return gulp.src(paths.scripts)
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'))
+    .pipe(jshint.reporter('fail'));
+});
+
+/**
  * Building all of the project
  */
 
 gulp.task('build', ['jsqrcode', 'scripts'], function () {
   return gulp.src(paths.build)
-    .pipe(concat('main.min.js'))
+    .pipe(concat(target))
     .pipe(gulp.dest('build'));
 });
 
 gulp.task('build-no-uglify', ['jsqrcode', 'scripts'], function () {
   return gulp.src(paths.build)
-    .pipe(concat('main.min.js'))
+    .pipe(concat(target))
     .pipe(gulp.dest('build'));
 });
 
@@ -83,4 +98,4 @@ gulp.task('watch', function() {
   gulp.watch(paths.scripts, ['build']);
 });
 
-gulp.task('default', ['build'])
+gulp.task('default', ['hinting', 'build'])

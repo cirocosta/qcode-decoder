@@ -1,6 +1,6 @@
 function QRCodeDecoder () {
   this.tmrCapture = null;
-  this.canvasElem;
+  this.canvasElem = null;
 }
 
 QRCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
@@ -17,14 +17,15 @@ QRCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
 QRCodeDecoder.prototype.captureToCanvas = function () {
   var scope = this;
 
-  if (this.tmrCapture)
+  if (this.tmrCapture) {
     clearTimeout(this.tmrCapture);
+  }
 
   var gCtx = this.canvasElem.getContext("2d");
   gCtx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
   try{
-    gCtx.drawImage(v,0,0);
+    gCtx.drawImage(this.videoElem,0,0);
     try{
       qrcode.decode();
     }
@@ -65,6 +66,7 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem) {
   if (navigator.getUserMedia) {
     navigator.getUserMedia({video:true, audio:false}, function (stream) {
       videoElem.src = window.URL.createObjectURL(stream);
+      scope.videoElem = videoElem;
       setTimeout(function () {
         scope.captureToCanvas.apply(scope, null);
       }, 500);
@@ -72,7 +74,7 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem) {
       console.log("An error occurred while getting video stream: ", err);
     });
   } else {
-    alert('Couldn\'t get video from camera :(');
+    console.log('Couldn\'t get video from camera');
   }
 
   setTimeout(function () {
