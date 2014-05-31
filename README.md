@@ -18,9 +18,8 @@ attach it to your html file
 
 and use it!
 
-```html
-<!-- TODO -->
-```
+*For a full example, see `/examples` or the plunkr*
+
 
 ## Testing
 

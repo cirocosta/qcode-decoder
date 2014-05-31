@@ -7,7 +7,7 @@ var rimraf = require('rimraf');
 var _ = require('lodash');
 
 /**
- * Paths and dirs
+ * Constants
  */
 
 var paths = {
@@ -58,6 +58,13 @@ gulp.task('build', ['jsqrcode', 'scripts'], function () {
     .pipe(concat('main.min.js'))
     .pipe(gulp.dest('build'));
 });
+
+gulp.task('build-no-uglify', ['jsqrcode', 'scripts'], function () {
+  return gulp.src(paths.build)
+    .pipe(concat('main.min.js'))
+    .pipe(gulp.dest('build'));
+});
+
 
 /**
  * Auxiliary tasks
