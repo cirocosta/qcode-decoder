@@ -23,6 +23,7 @@ var paths = {
 };
 
 var dirs = {
+  build: 'build',
   buildSrc: 'build/js'
 };
 
@@ -63,7 +64,12 @@ gulp.task('build', ['jsqrcode', 'scripts'], function () {
  */
 
 gulp.task('clean', function () {
-  rimraf(paths.buildSrc);
+  rimraf(dirs.build, function (err) {
+    if (err) {
+      console.log("'clean' gulp task raised an error: ", err);
+      process.exit(1);
+    }
+  });
 });
 
 gulp.task('watch', function() {
