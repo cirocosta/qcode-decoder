@@ -3,7 +3,12 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+var rimraf = require('rimraf');
 var _ = require('lodash');
+
+/**
+ * Paths and dirs
+ */
 
 var paths = {
   scripts: ['src/**/*.js'],
@@ -13,36 +18,56 @@ var paths = {
              "decoder.js", "qrcode.js", "findpat.js", "alignpat.js",
              "databr.js"], function (file) {
               return 'vendor/' + file;
-             })
+             }),
+  build: ['build/js/*.js']
 };
+
+var dirs = {
+  buildSrc: 'build/js'
+};
+
+/**
+ * Building the jsqrcode lib
+ */
 
 gulp.task('jsqrcode', function () {
   return gulp.src(paths.jsqrcode)
-    .pipe(uglify())
+    .pipe(uglify({mangle: true}))
     .pipe(concat('jsqrcode.min.js'))
+    .pipe(gulp.dest(dirs.buildSrc));
+});
+
+/**
+ * Building our own scripts
+ */
+
+gulp.task('scripts', function() {
+  return gulp.src(paths.scripts)
+    .pipe(uglify({mangle: true}))
+    .pipe(concat('src.min.js'))
+    .pipe(gulp.dest(dirs.buildSrc));
+});
+
+/**
+ * Building all of the project
+ */
+
+gulp.task('build', ['jsqrcode', 'scripts'], function () {
+  return gulp.src(paths.build)
+    .pipe(concat('main.min.js'))
     .pipe(gulp.dest('build'));
 });
 
-gulp.task('scripts', function() {
-  // Minify and copy all JavaScript (except vendor scripts)
-  return gulp.src(paths.scripts)
-    .pipe(uglify())
-    .pipe(concat('main.min.js'))
-    .pipe(gulp.dest('build/js'));
+/**
+ * Auxiliary tasks
+ */
+
+gulp.task('clean', function () {
+  rimraf(paths.buildSrc);
 });
 
-
-// Copy all static images
-gulp.task('images', function() {
- return gulp.src(paths.images)
-    // Pass in options to the task
-    .pipe(gulp.dest('build/img'));
-});
-
-// Rerun the task when a file changes
 gulp.task('watch', function() {
-  gulp.watch(paths.scripts, ['scripts']);
+  gulp.watch(paths.scripts, ['build']);
 });
 
-// The default task (called when you run `gulp` from cli)
-gulp.task('default', ['scripts', 'watch'])
+gulp.task('default', ['build'])

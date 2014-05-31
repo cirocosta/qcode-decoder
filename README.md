@@ -13,7 +13,7 @@ $ bower install qcode
 attach it to your html file
 
 ```html
-<script src="../bower_components/qcode-js/build/qcode.min.js">
+<script src="../bower_components/qcode-js/build/qcode.min.js"></script>
 ```
 
 and use it!
