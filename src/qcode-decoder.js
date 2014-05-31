@@ -9,6 +9,8 @@ QRCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
   canvasElem.width = width;
   canvasElem.height = height;
 
+  qrcode.setCanvasElement(canvasElem);
+
   this.canvasElem = canvasElem;
 
   return canvasElem;
