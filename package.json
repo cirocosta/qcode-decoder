@@ -1,6 +1,6 @@
 {
   "name": "qcode-decoder",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Decodes QRCode in the browser / node",
   "main": "index.js",
   "directories": {
