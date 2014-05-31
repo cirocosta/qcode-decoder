@@ -7,7 +7,7 @@
 Download it as a dependency
 
 ```sh
-$ bower install qcode
+$ bower install qcode-decoder
 ```
 
 attach it to your html file
@@ -18,12 +18,11 @@ attach it to your html file
 
 and use it!
 
-*For a full example, see `/examples` or the plunkr*
+**For a full example, see `/examples` or [this plunkr](http://plnkr.co/aWikiL)**
 
+## Messing around
 
-## Testing
-
-For testing this module, run `npm run start-server` and then go to `http://localhost:8080/examples` for seing the sorcery :neckbeard:
+For messing around w/ this module and making the example alive, run `npm run start-server` and then go to `http://localhost:8080/examples`
 
 ## Credits
 
