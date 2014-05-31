@@ -29,12 +29,6 @@ var targets = {
   src: 'src.min.js',
 };
 
-if (!shouldUglify) {
-  for (var i in targets) {
-    targets[i] = targets[i].replace('.min', '');
-  }
-}
-
 var paths = {
   scripts: ['src/**/*.js'],
   jsqrcode: _.map(["grid.js", "version.js", "detector.js", "formatinf.js",
@@ -53,6 +47,16 @@ var dirs = {
   buildSrc: 'build/js',
   testRunner: 'test/runner.html'
 };
+
+/**
+ * if --raw passed
+ */
+
+if (!shouldUglify) {
+  for (var i in targets) {
+    targets[i] = targets[i].replace('.min', '');
+  }
+}
 
 /**
  * Building the src and jsqrcode lib
