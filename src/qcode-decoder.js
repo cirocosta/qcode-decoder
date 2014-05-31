@@ -116,3 +116,7 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
 QRCodeDecoder.prototype.setDecoderCallback = function (cb) {
   qrcode.callback = cb;
 };
+
+QRCodeDecoder.prototype.decodeFromSrc = function(src) {
+  qrcode.decode(src);
+};
