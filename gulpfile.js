@@ -1,17 +1,39 @@
 'use strict';
 
+/**
+ * Build configuration for qcode-decoder!
+ *
+ * If you don't want to use the minified version:
+ * $ gulp clean && gulp --raw
+ */
+
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var jshint = require('gulp-jshint');
+var qunit = require('gulp-qunit');
+var gulpif = require('gulp-if');
 var rimraf = require('rimraf');
 var _ = require('lodash');
+var argv = require('minimist')(process.argv.slice(2));
 
 /**
  * Constants
  */
 
-var target = 'qcode-decoder.min.js';
+var shouldUglify = argv.raw ? false : true;
+
+var targets = {
+  target: 'qcode-decoder.min.js',
+  jsqrcode: 'jsqrcode.min.js',
+  src: 'src.min.js',
+};
+
+if (!shouldUglify) {
+  for (var i in targets) {
+    targets[i] = targets[i].replace('.min', '');
+  }
+}
 
 var paths = {
   scripts: ['src/**/*.js'],
@@ -28,28 +50,27 @@ var paths = {
 
 var dirs = {
   build: 'build',
-  buildSrc: 'build/js'
+  buildSrc: 'build/js',
+  testRunner: 'test/runner.html'
 };
 
 /**
- * Building the jsqrcode lib
+ * Building the src and jsqrcode lib
  */
 
 gulp.task('jsqrcode', function () {
   return gulp.src(paths.jsqrcode)
-    .pipe(uglify({mangle: true}))
-    .pipe(concat('jsqrcode.min.js'))
+    .pipe(gulpif(shouldUglify,
+                 uglify({mangle: true})))
+    .pipe(concat(targets.jsqrcode))
     .pipe(gulp.dest(dirs.buildSrc));
 });
 
-/**
- * Building our own scripts
- */
-
 gulp.task('scripts', function() {
   return gulp.src(paths.scripts)
-    .pipe(uglify({mangle: true}))
-    .pipe(concat('src.min.js'))
+    .pipe(gulpif(shouldUglify,
+                 uglify({mangle: true})))
+    .pipe(concat(targets.src))
     .pipe(gulp.dest(dirs.buildSrc));
 });
 
@@ -58,10 +79,15 @@ gulp.task('scripts', function() {
  */
 
 gulp.task('hinting', function () {
-  return gulp.src(paths.scripts)
+  return gulp.src(_.union(paths.scripts, paths.tests))
     .pipe(jshint())
     .pipe(jshint.reporter('default'))
     .pipe(jshint.reporter('fail'));
+});
+
+gulp.task('qunit', function () {
+  return gulp.src(dirs.testRunner)
+    .pipe(qunit());
 });
 
 /**
@@ -70,16 +96,9 @@ gulp.task('hinting', function () {
 
 gulp.task('build', ['jsqrcode', 'scripts'], function () {
   return gulp.src(paths.build)
-    .pipe(concat(target))
+    .pipe(concat(targets.target))
     .pipe(gulp.dest('build'));
 });
-
-gulp.task('build-no-uglify', ['jsqrcode', 'scripts'], function () {
-  return gulp.src(paths.build)
-    .pipe(concat(target))
-    .pipe(gulp.dest('build'));
-});
-
 
 /**
  * Auxiliary tasks
@@ -88,14 +107,16 @@ gulp.task('build-no-uglify', ['jsqrcode', 'scripts'], function () {
 gulp.task('clean', function () {
   rimraf(dirs.build, function (err) {
     if (err) {
-      console.log("'clean' gulp task raised an error: ", err);
+      process.stdout.write("'clean' gulp task raised an error: ", err);
       process.exit(1);
     }
   });
 });
 
-gulp.task('watch', function() {
-  gulp.watch(paths.scripts, ['build']);
-});
 
-gulp.task('default', ['hinting', 'build'])
+gulp.task('test', ['hinting', 'qunit']);
+gulp.task('default', ['test', 'build']);
+
+gulp.task('watch', function() {
+  gulp.watch(_.union(paths.scripts, paths.tests, paths.vendor), ['default']);
+});

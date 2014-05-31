@@ -23,5 +23,8 @@
     "qrcode-browser",
     "nodejs",
     "html5"
-  ]
+  ],
+  "dependencies": {
+    "qunit": "~1.14.0"
+  }
 }

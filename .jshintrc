@@ -14,6 +14,10 @@
     "window": false,
     "document": false,
     "navigator": false,
-    "qrcode": false
+    "qrcode": false,
+    "test": false,
+    "ok": false,
+    "asyncTest": false,
+    "expect": false
   }
 }
