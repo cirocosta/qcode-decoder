@@ -1,7 +1,8 @@
 {
   "name": "qcode-js",
-  "main": "index.js",
-  "version": "0.0.0",
+  "main": "build/main.min.js",
+  "description":"Decodes QRCode in the browser / node",
+  "version": "0.0.1",
   "homepage": "https://github.com/cirocosta/qcode-js",
   "authors": [
     "Ciro S. Costa <ciro.costa@usp.br>"
@@ -12,6 +13,7 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "examples",
+    "vendor"
   ]
 }

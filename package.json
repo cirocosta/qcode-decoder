@@ -1,21 +1,18 @@
 {
   "name": "qcode-js",
   "version": "0.0.0",
-  "description": "",
+  "description": "Decodes QRCode in the browser / node",
   "main": "index.js",
   "directories": {
     "example": "examples",
     "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/cirocosta/qcode-js.git"
   },
   "author": "Ciro S. Costa <ciro9758@gmail.com> (http://www.cirocosta.com.br/)",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/cirocosta/qcode-js/issues"
   },
