@@ -18,6 +18,7 @@
     "test": false,
     "ok": false,
     "asyncTest": false,
-    "expect": false
+    "expect": false,
+    "MediaStreamTrack": false
   }
 }

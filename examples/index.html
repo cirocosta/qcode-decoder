@@ -7,9 +7,15 @@
 
 	<canvas width="400" height="400" style="display: none"></canvas>
 	<video autoplay></video>
-	<button>Reset</button>
+	<button id="reset">Reset</button>
 
-	<script src="../build/qcode-decoder.min.js"></script>
+	<div id="camera-selector">
+		<button id="user">Front Camera</button>
+		<button id="environment">Back Camera</button>
+	</div>
+
+	<script src="../build/js/jsqrcode.min.js"></script>
+	<script src="../src/qcode-decoder.js"></script>
 	<script type="text/javascript">
 		var qr = new QRCodeDecoder();
 
@@ -20,11 +26,25 @@
 		  });
 		}
 
-		qr.prepareVideo(document.querySelector('video'));
+		var videoElem = document.querySelector('video');
 
-		document.querySelector('button').onclick = function () {
-		  qr.prepareVideo(document.querySelector('video'));
-		}
+		qr.prepareVideo(videoElem, function () {
+			console.log("error");
+		});
+
+		document.getElementById('reset').onclick = function () {
+		  qr.prepareVideo(videoElem);
+		};
+
+		document.getElementById('user').onclick = function () {
+			qr.prepareVideo(videoElem, 'user');
+		};
+		document.getElementById('environment').onclick = function () {
+			qr.prepareVideo(videoElem, 'environment', function (e) {
+				console.log("error: ", e);
+			});
+		};
+
 	</script>
 </body>
 </html>
