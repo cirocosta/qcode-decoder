@@ -79,10 +79,10 @@ gulp.task('scripts', function() {
 });
 
 /**
- * Hinting and testing
+ * jshint and testing
  */
 
-gulp.task('hinting', function () {
+gulp.task('jshint', function () {
   return gulp.src(_.union(paths.scripts, paths.tests))
     .pipe(jshint())
     .pipe(jshint.reporter('default'))
@@ -118,7 +118,7 @@ gulp.task('clean', function () {
 });
 
 
-gulp.task('test', ['hinting', 'qunit']);
+gulp.task('test', ['jshint', 'qunit']);
 gulp.task('default', ['test', 'build']);
 
 gulp.task('watch', function() {

@@ -48,14 +48,14 @@ QRCodeDecoder.prototype._captureToCanvas = function () {
       qrcode.decode();
     }
     catch(e){
-      console.log(e);
+      // console.log(e);
       this.tmrCapture = setTimeout(function () {
         scope._captureToCanvas.apply(scope, null);
       }, 500);
     }
   }
   catch(e){
-      console.log(e);
+      // console.log(e);
       this.tmrCapture = setTimeout(function () {
         scope._captureToCanvas.apply(scope, null);
       }, 500);
@@ -82,11 +82,18 @@ QRCodeDecoder.prototype.isCanvasSupported = function () {
 /**
  * Prepares the video element for receiving camera's input.
  * @param  {DOMElement} videoElem <video> dom element
+ * @param {facing} string which camera to use (optional).
  * @param  {Function} errcb     callback function to be called in case
  *                              of error
  */
-QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
+QRCodeDecoder.prototype.prepareVideo = function(videoElem, facing, errcb) {
   var scope = this;
+  var constraints = {
+    video: true,
+    audio: false
+  };
+
+  console.log("jiadsojioads");
 
   navigator.getUserMedia = navigator.getUserMedia ||
       navigator.webkitGetUserMedia ||
@@ -94,20 +101,62 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
       navigator.msGetUserMedia;
 
   if (navigator.getUserMedia) {
-    navigator.getUserMedia({video:true, audio:false}, function (stream) {
-      videoElem.src = window.URL.createObjectURL(stream);
-      scope.videoElem = videoElem;
-      setTimeout(function () {
-        scope._captureToCanvas.apply(scope, null);
-      }, 500);
-    }, errcb);
+    if (!facing) {
+      scope.callGUM(videoElem, constraints, scope, errcb);
+      return;
+    }
+
+    this.getSources(function (sources) {
+      for (var i in sources) {
+        console.log(sources);
+        var source = sources[i];
+        if (source.facing === facing) {
+          constraints.video = {
+            optional: [{sourceId: source.id}]
+          }
+        }
+      }
+      scope.callGUM(videoElem, constraints, scope, errcb);
+    });
   } else {
     console.log('Couldn\'t get video from camera');
+    return;
   }
 
   setTimeout(function () {
     scope._captureToCanvas.apply(scope, null);
   }, 500);
+};
+
+QRCodeDecoder.prototype.callGUM = function (videoElem, constraints, scope, errcb) {
+
+  console.log(errcb);
+
+  navigator.getUserMedia(constraints, function (stream) {
+    videoElem.src = window.URL.createObjectURL(stream);
+
+    scope.videoElem = videoElem;
+    setTimeout(function () {
+      scope._captureToCanvas.apply(scope, null);
+    }, 500);
+  }, errcb || function(){});
+};
+
+QRCodeDecoder.prototype.getSources = function (cb) {
+  var constraints = {};
+  var videoSources = [];
+
+  MediaStreamTrack.getSources(function (sourceInfos) {
+    for (var i = 0; i !== sourceInfos.length; ++i) {
+      var sourceInfo = sourceInfos[i];
+
+      if (sourceInfo.kind === 'video') {
+        videoSources.push(sourceInfo);
+      }
+    }
+
+    cb(videoSources);
+  });
 };
 
 /**
