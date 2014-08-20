@@ -7,7 +7,8 @@
 
 	<canvas width="400" height="400" style="display: none"></canvas>
 	<video autoplay></video>
-	<button>Reset</button>
+	<button id="reset">Reset</button>
+	<button id="stop" >Stop</button>
 
 	<script src="../build/qcode-decoder.min.js"></script>
 	<script type="text/javascript">
@@ -20,11 +21,20 @@
 		  });
 		}
 
-		qr.prepareVideo(document.querySelector('video'));
-
-		document.querySelector('button').onclick = function () {
-		  qr.prepareVideo(document.querySelector('video'));
+		function errCb (err) {
+			console.error(err);
 		}
+
+		qr.prepareVideo(document.querySelector('video'), errCb);
+
+		document.querySelector('#reset').onclick = function () {
+		  qr.prepareVideo(document.querySelector('video'), errCb);
+		}
+
+		document.querySelector('#stop').onclick = function () {
+			qr.releaseVideo();
+		};
+
 	</script>
 </body>
 </html>
