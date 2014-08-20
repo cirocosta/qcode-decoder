@@ -97,6 +97,7 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
     navigator.getUserMedia({video:true, audio:false}, function (stream) {
       videoElem.src = window.URL.createObjectURL(stream);
       scope.videoElem = videoElem;
+      scope.stream = stream;
       setTimeout(function () {
         scope._captureToCanvas.apply(scope, null);
       }, 500);
@@ -108,6 +109,13 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
   setTimeout(function () {
     scope._captureToCanvas.apply(scope, null);
   }, 500);
+};
+
+/**
+ * Releases a video stream that was being captured by prepareToVideo
+ */
+QRCodeDecoder.prototype.releaseVideo = function() {
+  this.stream.stop();
 };
 
 /**
