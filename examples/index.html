@@ -25,14 +25,17 @@
 			console.error(err);
 		}
 
-		qr.prepareVideo(document.querySelector('video'), errCb);
+		qr.getVideoSources(function(sources) {
+			qr.prepareVideo(document.querySelector('video'), errCb);
+		});
+
 
 		document.querySelector('#reset').onclick = function () {
 		  qr.prepareVideo(document.querySelector('video'), errCb);
 		}
 
 		document.querySelector('#stop').onclick = function () {
-			qr.releaseVideo();
+			qr.stop();
 		};
 
 	</script>

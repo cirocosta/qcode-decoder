@@ -4,6 +4,7 @@
 function QRCodeDecoder () {
   this.tmrCapture = null;
   this.canvasElem = null;
+  this.videoConstraints = {video: true, audio: false};
 }
 
 /**
@@ -37,34 +38,35 @@ QRCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
 
 QRCodeDecoder.prototype._captureToCanvas = function () {
   var scope = this;
-  var cWidth = this.canvasElem.width;
-  var cHeight = this.canvasElem.height;
 
   if (this.tmrCapture) {
     clearTimeout(this.tmrCapture);
   }
 
-  var gCtx = this.canvasElem.getContext("2d");
-  gCtx.clearRect(0, 0, cWidth, cHeight);
+  if (!this.videoDimensions && this.videoElem.videoWidth && this.videoElem.videoHeight) {
+    this.videoDimensions = {
+      w: this.videoElem.videoWidth,
+      h: this.videoElem.videoHeight
+    };
+    this.prepareCanvas(this.canvasElem, this.videoDimensions.w, this.videoDimensions.h);
+  }
 
-  try{
-    gCtx.drawImage(this.videoElem, 0, 0,cWidth,cHeight);
+  if (this.videoDimensions) {
+    var gCtx = this.canvasElem.getContext("2d");
+    gCtx.clearRect(0, 0, this.videoElem.videoWidth, this.videoElem.videoHeight);
+
     try{
+      gCtx.drawImage(this.videoElem, 0, 0,this.videoDimensions.w, this.videoDimensions.h);
       qrcode.decode();
+      return;
     }
     catch(e){
-      console.log(e);
-      this.tmrCapture = setTimeout(function () {
-        scope._captureToCanvas.apply(scope, null);
-      }, 500);
+        console.log(e);
     }
   }
-  catch(e){
-      console.log(e);
-      this.tmrCapture = setTimeout(function () {
-        scope._captureToCanvas.apply(scope, null);
-      }, 500);
-  }
+  this.tmrCapture = setTimeout(function () {
+    scope._captureToCanvas.apply(scope, null);
+  }, 500);
 };
 
 /**
@@ -95,6 +97,8 @@ QRCodeDecoder.prototype.isCanvasSupported = function () {
  */
 QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
   var scope = this;
+  
+  this.stop();
 
   navigator.getUserMedia = navigator.getUserMedia ||
       navigator.webkitGetUserMedia ||
@@ -102,10 +106,11 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
       navigator.msGetUserMedia;
 
   if (navigator.getUserMedia) {
-    navigator.getUserMedia({video:true, audio:false}, function (stream) {
+    navigator.getUserMedia(this.videoConstraints, function (stream) {
       videoElem.src = window.URL.createObjectURL(stream);
       scope.videoElem = videoElem;
       scope.stream = stream;
+      scope.videoDimensions = false;
       setTimeout(function () {
         scope._captureToCanvas.apply(scope, null);
       }, 500);
@@ -113,25 +118,71 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
   } else {
     console.log('Couldn\'t get video from camera');
   }
-
-  setTimeout(function () {
-    scope._captureToCanvas.apply(scope, null);
-  }, 500);
 };
+ 
+ /**
++ * Releases a video stream that was being captured by prepareToVideo
++ */
+QRCodeDecoder.prototype.stop = function() {
+  if (this.stream) {
+    this.stream.stop();
+    delete this.stream;
+  }
+  if (this.tmrCapture) {
+    clearTimeout(this.tmrCapture);
+    delete this.tmrCapture;
+  }
+};
+
 
 /**
- * Releases a video stream that was being
- * captured by prepareToVideo
+ * Sets the sourceId for the camera to use.
+ *
+ * The sourceId can be found using the getVideoSources
+ * function on a browser that supports it (currently
+ * only Chrome).
+ * 
+ * @param {String} sourceId     The id of the video
+ * source you want to use (or false to use the current default)
  */
-QRCodeDecoder.prototype.releaseVideo = function() {
-  this.stream.stop();
+QRCodeDecoder.prototype.setSourceId = function (sourceId) {
+  if (sourceId) {
+    this.videoConstraints.video = {
+      optional: [{
+        sourceId: sourceId
+      }]
+    };
+  } else {
+    this.videoConstraints.video = true;
+  }
 };
+
 
 /**
  * Sets the callback for the decode event
  */
 QRCodeDecoder.prototype.setDecoderCallback = function (cb) {
   qrcode.callback = cb;
+};
+
+/**
+ * Gets a list of all available video sources on the device
+ */
+QRCodeDecoder.prototype.getVideoSources = function(cb) {
+  var sources = [];
+  if (MediaStreamTrack && MediaStreamTrack.getSources) {
+    MediaStreamTrack.getSources(function (sourceInfos) {
+      sourceInfos.forEach(function(sourceInfo) {
+        if (sourceInfo.kind === 'video') {
+          sources.push(sourceInfo);
+        }
+      });
+      cb(sources);
+    });
+  } else {
+    console.log('Your browser doesn\'t support MediaStreamTrack.getSources');
+    cb(sources);
+  }
 };
 
 QRCodeDecoder.prototype.decodeFromSrc = function(src) {
