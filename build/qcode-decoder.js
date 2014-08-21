@@ -3873,7 +3873,7 @@ QRCodeDecoder.prototype._captureToCanvas = function () {
   gCtx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
   try{
-    gCtx.drawImage(this.videoElem,0,0);
+    gCtx.drawImage(this.videoElem,0,0,this.canvasElem.width,this.canvasElem.height);
     try{
       qrcode.decode();
     }
