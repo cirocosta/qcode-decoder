@@ -46,10 +46,6 @@ gulp.task('build', ['build-vendor'], function() {
     .pipe(gulp.dest('build'));
 });
 
-// /**
-//  * Hinting and testing
-//  */
-
 gulp.task('hint', function () {
   return gulp.src('src/*.js')
     .pipe(jshint())

@@ -1,6 +1,6 @@
 {
   "name": "qcode-decoder",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Decodes QRCode in the Browser and Node",
   "main": "index.js",
   "directories": {
@@ -10,9 +10,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/cirocosta/qcode-decoder.git"
-  },
-  "scripts": {
-    "test": "gulp test"
   },
   "author": "Ciro S. Costa <ciro9758@gmail.com> (http://cirocosta.github.io/)",
   "license": "MIT",

@@ -2,7 +2,7 @@
   "name": "qcode-decoder",
   "main": "build/main.min.js",
   "description": "Decodes QRCode in the browser and node",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "homepage": "https://github.com/cirocosta/qcode-decoder",
   "authors": [
     "Ciro S. Costa <ciro.costa@usp.br>"
