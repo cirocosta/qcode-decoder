@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>QRCode Decoder - select camera example</title>
+	</head>
+	<body>
+
+	<canvas width="400" height="400" style="display: none"></canvas>
+	<video autoplay></video>
+	<select id="cameraSelect"></select>
+	<button id="reset">Reset</button>
+	<button id="stop" >Stop</button>
+
+	<p id="multi-camera-message"></p>
+
+	<script src="../build/qcode-decoder.min.js"></script>
+	<script type="text/javascript">
+		var qr = new QRCodeDecoder();
+
+		if (qr.isCanvasSupported() || qr.hasGetUserMedia()) {
+		  qr.prepareCanvas(document.querySelector('canvas'), 800,600);
+		  qr.setDecoderCallback(function (a) {
+		    console.log(a);
+		  });
+		}
+
+		function errCb (err) {
+			console.error(err);
+		}
+
+		qr.getVideoSources(function(sources) {
+			var sel = document.getElementById('cameraSelect');
+			if (sources.length) {
+				sources.forEach(function(source) {
+					var option = document.createElement('option');
+					option.value = source.id;
+					option.text = source.facing || 'default';
+					sel.add(option);
+				});
+				sel.onchange = function() {
+					qr.setSourceId(sel.selectedOptions[0].value);
+					qr.prepareVideo(document.querySelector('video'), errCb);
+				};
+				document.getElementById('multi-camera-message').innerHTML = 'Your browser is currently exposing ' + sources.length + ' cameras - use the dropdown above to select which you want to use';
+				sel.onchange();
+			} else {
+				sel.remove();
+				qr.prepareVideo(document.querySelector('video'), errCb);
+				document.getElementById('multi-camera-message').innerHTML = 'Your browser does not support getting info on the available cameras via Javascript';
+			}
+		});
+
+
+		document.querySelector('#reset').onclick = function () {
+			qr.prepareVideo(document.querySelector('video'), errCb);
+		}
+
+		document.querySelector('#stop').onclick = function () {
+			qr.stop();
+		};
+
+	</script>
+</body>
+</html>
