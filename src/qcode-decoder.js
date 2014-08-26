@@ -43,20 +43,29 @@ QRCodeDecoder.prototype._captureToCanvas = function () {
     clearTimeout(this.tmrCapture);
   }
 
-  if (!this.videoDimensions && this.videoElem.videoWidth && this.videoElem.videoHeight) {
+  if (!this.videoDimensions &&
+      this.videoElem.videoWidth &&
+      this.videoElem.videoHeight) {
+
     this.videoDimensions = {
       w: this.videoElem.videoWidth,
       h: this.videoElem.videoHeight
     };
-    this.prepareCanvas(this.canvasElem, this.videoDimensions.w, this.videoDimensions.h);
+
+    this.prepareCanvas(this.canvasElem,
+                       this.videoDimensions.w,
+                       this.videoDimensions.h);
   }
 
   if (this.videoDimensions) {
     var gCtx = this.canvasElem.getContext("2d");
-    gCtx.clearRect(0, 0, this.videoElem.videoWidth, this.videoElem.videoHeight);
+    gCtx.clearRect(0, 0, this.videoElem.videoWidth,
+                         this.videoElem.videoHeight);
 
     try{
-      gCtx.drawImage(this.videoElem, 0, 0,this.videoDimensions.w, this.videoDimensions.h);
+      gCtx.drawImage(this.videoElem, 0, 0,
+                     this.videoDimensions.w,
+                     this.videoDimensions.h);
       qrcode.decode();
       return;
     }
@@ -97,7 +106,7 @@ QRCodeDecoder.prototype.isCanvasSupported = function () {
  */
 QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
   var scope = this;
-  
+
   this.stop();
 
   navigator.getUserMedia = navigator.getUserMedia ||
@@ -119,10 +128,11 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
     console.log('Couldn\'t get video from camera');
   }
 };
- 
- /**
-+ * Releases a video stream that was being captured by prepareToVideo
-+ */
+
+/**
+ * Releases a video stream that was being
+ * captured by prepareToVideo
+ */
 QRCodeDecoder.prototype.stop = function() {
   if (this.stream) {
     this.stream.stop();
@@ -138,12 +148,13 @@ QRCodeDecoder.prototype.stop = function() {
 /**
  * Sets the sourceId for the camera to use.
  *
- * The sourceId can be found using the getVideoSources
- * function on a browser that supports it (currently
- * only Chrome).
- * 
- * @param {String} sourceId     The id of the video
- * source you want to use (or false to use the current default)
+ * The sourceId can be found using the
+ * getVideoSources function on a browser that
+ * supports it (currently only Chrome).
+ *
+ * @param {String} sourceId     The id of the
+ * video source you want to use (or false to use
+ * the current default)
  */
 QRCodeDecoder.prototype.setSourceId = function (sourceId) {
   if (sourceId) {
@@ -166,7 +177,8 @@ QRCodeDecoder.prototype.setDecoderCallback = function (cb) {
 };
 
 /**
- * Gets a list of all available video sources on the device
+ * Gets a list of all available video sources on
+ * the device
  */
 QRCodeDecoder.prototype.getVideoSources = function(cb) {
   var sources = [];
