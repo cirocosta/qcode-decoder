@@ -2,12 +2,14 @@
 
 var fs = require('fs')
   , pkg = require('./package.json')
+
   , gulp = require('gulp')
   , concat = require('gulp-concat')
   , rename = require('gulp-rename')
   , uglify = require('gulp-uglify')
-  , header = require('gulp-header')
-  , jshint = require('gulp-jshint');
+  , jshint = require('gulp-jshint')
+  , sourcemaps = require('gulp-sourcemaps');
+
 
 var paths = {
   jsqrcode: [
@@ -18,31 +20,15 @@ var paths = {
     "databr.js"].map(function (file) { return 'vendor/' + file; })
 };
 
-
-gulp.task('build-vendor', function () {
-  var vendorHeader = fs.readFileSync(__dirname + '/vendor/header.txt');
-
-  return gulp.src(paths.jsqrcode)
-    .pipe(concat('jsqrcode.js'))
-    .pipe(gulp.dest('build/vendor'))
-    .pipe(uglify({mangle: true}))
-    .pipe(header(vendorHeader))
+gulp.task('build', function() {
+  return gulp.src(paths.jsqrcode.concat(['src/qcode-decoder.js']))
+    .pipe(sourcemaps.init())
+      .pipe(concat('qcode-decoder.js'))
+      .pipe(uglify({mangle: true}))
     .pipe(rename(function (path) {
       path.extname = ".min.js"
     }))
-    .pipe(gulp.dest('build/vendor'));
-});
-
-gulp.task('build', ['build-vendor'], function() {
-  return gulp.src([
-      'build/vendor/jsqrcode.js',
-      'src/qcode-decoder.js'])
-    .pipe(concat('qcode-decoder.js'))
-    .pipe(gulp.dest('build'))
-    .pipe(uglify({mangle: true}))
-    .pipe(rename(function (path) {
-      path.extname = ".min.js"
-    }))
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('build'));
 });
 
