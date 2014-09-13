@@ -1,24 +1,13 @@
 {
-  "curly" : true,
-  "eqeqeq" : true,
-  "immed" : true,
-  "latedef" : true,
-  "newcap" : true,
-  "noarg" : true,
-  "sub" : true,
-  "undef" : true,
-  "boss" : true,
-  "eqnull" : true,
-  "node" : true,
-  "globals" : {
-    "window": false,
-    "document": false,
-    "navigator": false,
-    "qrcode": false,
-    "test": false,
-    "ok": false,
-    "asyncTest": false,
-    "expect": false,
-    "MediaStreamTrack": true
-  }
+	"bitwise": false,
+	"curly": false,
+	"freeze": true,
+	"undef": true,
+	"unused": true,
+
+	"laxcomma": true,
+
+	"browser": true,
+	"node": true,
+	"predef": ["qrcode", "MediaStreamTrack"]
 }

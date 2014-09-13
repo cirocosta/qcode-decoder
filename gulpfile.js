@@ -32,6 +32,7 @@ gulp.task('build', function() {
     .pipe(gulp.dest('build'));
 });
 
+
 gulp.task('hint', function () {
   return gulp.src('src/*.js')
     .pipe(jshint())
