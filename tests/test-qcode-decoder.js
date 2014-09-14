@@ -3,15 +3,9 @@
 var assert = require('assert');
 var QCodeDecoder = require('../src/qcode-decoder');
 
-// describe('qrcode', function() {
-//   it('be defined', function() {
-//     assert(!!require('../build/qrcode'));
-//   });
-// });
-
 describe('QCodeDecoder', function() {
-
   global.mocha.checkLeaks = false;
+  global.mocha.timeout = 20000;
 
   it('be defined', function() {
     assert(!!QCodeDecoder);
@@ -24,7 +18,7 @@ describe('QCodeDecoder', function() {
   });
 
   it('decode image from src', function(done) {
-    qr.decodeImage('./assets/qrcode.png', function (err, result) {
+    qr.decodeImage('tests/assets/qrcode.png', function (err, result) {
       if (err)
         return done(err);
 
