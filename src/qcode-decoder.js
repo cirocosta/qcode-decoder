@@ -77,7 +77,7 @@ QCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
  * @param  {Function} cb
  * @return {Object}      this
  */
-QCodeDecoder.prototype._captureToCanvas = function (cb) {
+QCodeDecoder.prototype._captureToCanvas = function (cb, once) {
   if (this.timerCapture)
     clearTimeout(this.timerCapture);
 
@@ -105,6 +105,8 @@ QCodeDecoder.prototype._captureToCanvas = function (cb) {
 
     try {
       cb(null, qrcode.decode());
+
+      if (once) return;
     } catch (err){
       if (err !== "Couldn't find enough finder patterns")
         cb(new Error(err));
@@ -112,7 +114,7 @@ QCodeDecoder.prototype._captureToCanvas = function (cb) {
   }
 
   this.timerCapture = setTimeout(function () {
-    this._captureToCanvas.call(this, cb);
+    this._captureToCanvas.call(this, cb, once);
   }.bind(this), 500);
 };
 
@@ -140,7 +142,7 @@ QCodeDecoder.prototype.decodeImage = function (img, cb) {
  *                              called in case of
  *                              error
  */
-QCodeDecoder.prototype.prepareVideo = function (videoElem, cb) {
+QCodeDecoder.prototype.prepareVideo = function (videoElem, cb, once) {
   var scope = this;
 
   this.stop();
@@ -155,7 +157,7 @@ QCodeDecoder.prototype.prepareVideo = function (videoElem, cb) {
     scope.videoDimensions = false;
 
     setTimeout(function () {
-      scope._captureToCanvas.call(scope, cb);
+      scope._captureToCanvas.call(scope, cb, once);
     }, 500);
   }, cb);
 
@@ -211,21 +213,17 @@ QCodeDecoder.prototype.getVideoSources = function (cb) {
   if (MediaStreamTrack && MediaStreamTrack.getSources) {
     MediaStreamTrack.getSources(function (sourceInfos) {
       sourceInfos.forEach(function(sourceInfo) {
-        if (sourceInfo.kind === 'video') {
+        if (sourceInfo.kind === 'video')
           sources.push(sourceInfo);
-        }
       });
       cb(null, sources);
     });
   } else {
-    cb(new Error('Your browser doesn\'t support MediaStreamTrack.getSources'));
+    cb(new Error('Current browser doest not support MediaStreamTrack.getSources'));
   }
 
   return this;
 };
 
-QCodeDecoder.prototype.decodeFromSrc = function (src) {
-  qrcode.decode(src);
-};
 
 return QCodeDecoder; }));
