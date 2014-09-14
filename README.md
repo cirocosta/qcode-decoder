@@ -2,6 +2,8 @@
 
 > Decodes QRCode in the browser
 
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/cirocosta_github.svg)](https://saucelabs.com/u/cirocosta_github)
+
 ## Using in your project
 
 Download it as a dependency
@@ -19,6 +21,43 @@ attach it to your `.html` file
 and use it!
 
 **For a full example, see `/examples` or [this plunkr](http://plnkr.co/aWikiL)**
+
+The API is Pretty simples
+
+### QCodeDecoder()
+Constructor. No args
+
+```javascript
+var qr = new QCodeDecoder();
+```
+
+### ::decodeFromImage(img)
+
+Decodes an image from a source provided or an `<img>` element with a `src` attribute set.
+
+```javascript
+qr.decodeImage(img, function (err, result) {
+  if (err) throw err;
+
+  alert(result);
+});
+```
+
+### ::decodeFromVideo(videoElem, cb, [,once])
+Decodes from a videoElement. The optional argument **once** makes the *QCodeDecoder* to only find a QRCode once.
+
+```javascript
+qr.decodeFromVideo(videoElem, function (err) {
+  if (err) throw err;
+
+  alert(result);
+});
+```
+
+### ::stop()
+
+Stops the current `qr` from searching for a QRCode.
+
 
 ## Messing around
 
