@@ -16,7 +16,7 @@
   (function () {
     'use strict';
 
-    var qr = new QRCodeDecoder();
+    var qr = new QCodeDecoder();
 
     if (!(qr.isCanvasSupported() && qr.hasGetUserMedia())) {
       alert('Your browser doesn\'t match the required specs.');
@@ -28,7 +28,7 @@
     var reset = document.querySelector('#reset');
     var stop = document.querySelector('#stop');
 
-    // QRCodeDecoder's API expect that the dev
+    // QCodeDecoder's API expect that the dev
     // prepares a handler for each time that it
     // wants to receive a result.
 

@@ -32,7 +32,7 @@ qrcode.setCanvasElement = function (element) {
     qrcode.canvasElement = element;
 }
 
-qrcode.decode = function(src){
+qrcode.decode = function(src, cb){
 
     if(arguments.length==0)
     {
@@ -70,7 +70,7 @@ qrcode.decode = function(src){
             try{
                 qrcode.imagedata = context.getImageData(0, 0, canvas_qr.width, canvas_qr.height);
             }catch(e){
-                qrcode.result = "Cross domain image reading not supported in your browser! Save it to your computer then drag and drop the file!";
+                qrcode.result = "Cross domain Error";
                 if(qrcode.callback!=null)
                     qrcode.callback(qrcode.result);
                 return;
@@ -79,11 +79,13 @@ qrcode.decode = function(src){
             try
             {
                 qrcode.result = qrcode.process(context);
+                cb(null, qrcode.result);
             }
             catch(e)
             {
                 // console.log(e);
-                qrcode.result = "error decoding QR Code";
+                qrcode.result = "Error decoding QR Code from Image";
+                cb(new Error("Error decoding QR Code from Image"));
             }
             if(qrcode.callback!=null)
                 qrcode.callback(qrcode.result);

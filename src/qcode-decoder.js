@@ -1,11 +1,11 @@
-(function (root, factory) {if (typeof define === 'function' && define.amd) define([], factory); else if (typeof exports === 'object') module.exports = factory(); else root.QRCodeDecoder = factory(); }(this, function () {
+(function (root, factory) {if (typeof define === 'function' && define.amd) define([], factory); else if (typeof exports === 'object') module.exports = factory(); else root.QCodeDecoder = factory(); }(this, function () {
 
 'use strict';
 
 /**
- * Constructor for QRCodeDecoder
+ * Constructor for QCodeDecoder
  */
-function QRCodeDecoder () {
+function QCodeDecoder () {
   this.timerCapture = null;
   this.canvasElem = null;
   this.stream = null;
@@ -15,7 +15,7 @@ function QRCodeDecoder () {
 /**
  * Verifies if canvas element is supported.
  */
-QRCodeDecoder.prototype.isCanvasSupported = function () {
+QCodeDecoder.prototype.isCanvasSupported = function () {
   var elem = document.createElement('canvas');
 
   return !!(elem.getContext && elem.getContext('2d'));
@@ -26,7 +26,7 @@ QRCodeDecoder.prototype.isCanvasSupported = function () {
  * Normalizes and Verifies if the user has
  * getUserMedia enabled in the browser.
  */
-QRCodeDecoder.prototype.hasGetUserMedia = function () {
+QCodeDecoder.prototype.hasGetUserMedia = function () {
   navigator.getUserMedia = navigator.getUserMedia ||
                            navigator.webkitGetUserMedia ||
                            navigator.mozGetUserMedia ||
@@ -54,7 +54,7 @@ QRCodeDecoder.prototype.hasGetUserMedia = function () {
  * after the resize if width and height
  * provided.
  */
-QRCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
+QCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
   if (width && height) {
     canvasElem.style.width = width + "px";
     canvasElem.style.height = height + "px";
@@ -77,7 +77,7 @@ QRCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
  * @param  {Function} cb
  * @return {Object}      this
  */
-QRCodeDecoder.prototype._captureToCanvas = function (cb) {
+QCodeDecoder.prototype._captureToCanvas = function (cb) {
   if (this.timerCapture)
     clearTimeout(this.timerCapture);
 
@@ -117,16 +117,15 @@ QRCodeDecoder.prototype._captureToCanvas = function (cb) {
 };
 
 /**
- * Prepares the iamgeElement to send its
- * information to the decoder
+ * Decodes an image from its src.
  * @param  {DOMNode}   imageElem
  * @param  {Function} cb        callback
  * @return {Object}             this
  */
-QRCodeDecoder.prototype.prepareImage = function (imageElem, cb) {
+QCodeDecoder.prototype.decodeImage = function (img, cb) {
+  img = img.src ? img.src : img;
 
-
-  return this;
+  return (qrcode.decode(img, cb), this);
 };
 
 /**
@@ -141,7 +140,7 @@ QRCodeDecoder.prototype.prepareImage = function (imageElem, cb) {
  *                              called in case of
  *                              error
  */
-QRCodeDecoder.prototype.prepareVideo = function (videoElem, cb) {
+QCodeDecoder.prototype.prepareVideo = function (videoElem, cb) {
   var scope = this;
 
   this.stop();
@@ -167,7 +166,7 @@ QRCodeDecoder.prototype.prepareVideo = function (videoElem, cb) {
  * Releases a video stream that was being
  * captured by prepareToVideo
  */
-QRCodeDecoder.prototype.stop = function() {
+QCodeDecoder.prototype.stop = function() {
   if (this.stream) {
     this.stream.stop();
     this.stream = undefined;
@@ -192,7 +191,7 @@ QRCodeDecoder.prototype.stop = function() {
  * video source you want to use (or false to use
  * the current default)
  */
-QRCodeDecoder.prototype.setSourceId = function (sourceId) {
+QCodeDecoder.prototype.setSourceId = function (sourceId) {
   if (sourceId)
     this.videoConstraints.video = { optional: [{ sourceId: sourceId }]};
   else
@@ -206,7 +205,7 @@ QRCodeDecoder.prototype.setSourceId = function (sourceId) {
  * Gets a list of all available video sources on
  * the device
  */
-QRCodeDecoder.prototype.getVideoSources = function (cb) {
+QCodeDecoder.prototype.getVideoSources = function (cb) {
   var sources = [];
 
   if (MediaStreamTrack && MediaStreamTrack.getSources) {
@@ -225,8 +224,8 @@ QRCodeDecoder.prototype.getVideoSources = function (cb) {
   return this;
 };
 
-QRCodeDecoder.prototype.decodeFromSrc = function (src) {
+QCodeDecoder.prototype.decodeFromSrc = function (src) {
   qrcode.decode(src);
 };
 
-return QRCodeDecoder; }));
+return QCodeDecoder; }));

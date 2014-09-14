@@ -15,7 +15,7 @@
 
   <script src="../build/qcode-decoder.min.js"></script>
   <script type="text/javascript">
-    var qr = new QRCodeDecoder();
+    var qr = new QCodeDecoder();
 
     if (qr.isCanvasSupported() || qr.hasGetUserMedia()) {
       qr.prepareCanvas(document.querySelector('canvas'), 800,600);

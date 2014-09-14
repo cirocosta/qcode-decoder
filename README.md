@@ -1,6 +1,6 @@
 # qcode-decoder
 
-> Decodes QRCode in the browser / node
+> Decodes QRCode in the browser
 
 ## Using in your project
 
@@ -10,7 +10,7 @@ Download it as a dependency
 $ bower install qcode-decoder
 ```
 
-attach it to your html file
+attach it to your `.html` file
 
 ```html
 <script src="../bower_components/qcode-decoder/build/qcode-decoder.min.js"></script>
@@ -22,12 +22,12 @@ and use it!
 
 ## Messing around
 
-For messing around w/ this module and making the example alive, run `npm run start-server` and then go to `http://localhost:8080/examples`
+The proper use of camera APIs and, then, the use of this module, the developer needs to first initiate a webserver for running the examples. I suggest going with [http-server](https://github.com/nodeapps/http-server).
 
 ## Credits
 
 The main decoder methods are from [Lazar Laszlo](http://www.
-lazarsoft.info/). Go check his work!
+lazarsoft.info/), who ported ZXing lib (Apache V2) to JavaScript.
 
 ## LICENSE
 
