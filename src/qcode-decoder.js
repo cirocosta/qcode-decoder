@@ -1,23 +1,55 @@
+(function (root, factory) {if (typeof define === 'function' && define.amd) define([], factory); else if (typeof exports === 'object') module.exports = factory(); else root.QRCodeDecoder = factory(); }(this, function () {
+
+'use strict';
+
 /**
  * Constructor for QRCodeDecoder
  */
 function QRCodeDecoder () {
-  this.tmrCapture = null;
+  this.timerCapture = null;
   this.canvasElem = null;
+  this.stream = null;
   this.videoConstraints = {video: true, audio: false};
 }
+
+/**
+ * Verifies if canvas element is supported.
+ */
+QRCodeDecoder.prototype.isCanvasSupported = function () {
+  var elem = document.createElement('canvas');
+
+  return !!(elem.getContext && elem.getContext('2d'));
+};
+
+
+/**
+ * Normalizes and Verifies if the user has
+ * getUserMedia enabled in the browser.
+ */
+QRCodeDecoder.prototype.hasGetUserMedia = function () {
+  navigator.getUserMedia = navigator.getUserMedia ||
+                           navigator.webkitGetUserMedia ||
+                           navigator.mozGetUserMedia ||
+                           navigator.msGetUserMedia;
+
+  return !!(navigator.getUserMedia);
+};
 
 /**
  * Prepares the canvas element (which will
  * receive the image from the camera and provide
  * what the algorithm needs for checking for a
  * QRCode and then decoding it.)
+ *
+ *
  * @param  {DOMElement} canvasElem the canvas
- * element
+ *                                 element
  * @param  {number} width      The width that
- * the canvas element should have
+ *                             the canvas element
+ *                             should have
  * @param  {number} height     The height that
- * the canvas element should have
+ *                             the canvas element
+ *                             should have
  * @return {DOMElement}            the canvas
  * after the resize if width and height
  * provided.
@@ -33,15 +65,21 @@ QRCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
   qrcode.setCanvasElement(canvasElem);
   this.canvasElem = canvasElem;
 
-  return canvasElem;
+  return this;
 };
 
-QRCodeDecoder.prototype._captureToCanvas = function () {
-  var scope = this;
-
-  if (this.tmrCapture) {
-    clearTimeout(this.tmrCapture);
-  }
+/**
+ * Based on the video dimensions and the canvas
+ * that was previously generated captures the
+ * video/image source and then paints into the
+ * canvas so that the decoder is able to work as
+ * it expects.
+ * @param  {Function} cb
+ * @return {Object}      this
+ */
+QRCodeDecoder.prototype._captureToCanvas = function (cb) {
+  if (this.timerCapture)
+    clearTimeout(this.timerCapture);
 
   if (!this.videoDimensions &&
       this.videoElem.videoWidth &&
@@ -61,72 +99,68 @@ QRCodeDecoder.prototype._captureToCanvas = function () {
     var gCtx = this.canvasElem.getContext("2d");
     gCtx.clearRect(0, 0, this.videoElem.videoWidth,
                          this.videoElem.videoHeight);
+    gCtx.drawImage(this.videoElem, 0, 0,
+                   this.videoDimensions.w,
+                   this.videoDimensions.h);
 
-    try{
-      gCtx.drawImage(this.videoElem, 0, 0,
-                     this.videoDimensions.w,
-                     this.videoDimensions.h);
-      qrcode.decode();
-      return;
-    }
-    catch(e){
-        console.log(e);
+    try {
+      cb(null, qrcode.decode());
+    } catch (err){
+      if (err !== "Couldn't find enough finder patterns")
+        cb(new Error(err));
     }
   }
-  this.tmrCapture = setTimeout(function () {
-    scope._captureToCanvas.apply(scope, null);
-  }, 500);
+
+  this.timerCapture = setTimeout(function () {
+    this._captureToCanvas.call(this, cb);
+  }.bind(this), 500);
 };
 
 /**
- * Verifies if the user has getUserMedia enabled
- * in the browser.
+ * Prepares the iamgeElement to send its
+ * information to the decoder
+ * @param  {DOMNode}   imageElem
+ * @param  {Function} cb        callback
+ * @return {Object}             this
  */
-QRCodeDecoder.prototype.hasGetUserMedia = function () {
-  return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia || navigator.msGetUserMedia);
-};
+QRCodeDecoder.prototype.prepareImage = function (imageElem, cb) {
 
-/**
- * Verifies if canvas element is supported.
- */
-QRCodeDecoder.prototype.isCanvasSupported = function () {
-  var elem = document.createElement('canvas');
 
-  return !!(elem.getContext && elem.getContext('2d'));
+  return this;
 };
 
 /**
  * Prepares the video element for receiving
- * camera's input.
+ * camera's input. Releases a stream if there
+ * was any (resets).
+ *
  * @param  {DOMElement} videoElem <video> dom
- * element
+ *                                element
  * @param  {Function} errcb     callback
- * function to be called in case of error
+ *                              function to be
+ *                              called in case of
+ *                              error
  */
-QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
+QRCodeDecoder.prototype.prepareVideo = function (videoElem, cb) {
   var scope = this;
 
   this.stop();
 
-  navigator.getUserMedia = navigator.getUserMedia ||
-      navigator.webkitGetUserMedia ||
-      navigator.mozGetUserMedia ||
-      navigator.msGetUserMedia;
+  if (!this.hasGetUserMedia())
+    cb(new Error('Couldn\'t get video from camera'));
 
-  if (navigator.getUserMedia) {
-    navigator.getUserMedia(this.videoConstraints, function (stream) {
-      videoElem.src = window.URL.createObjectURL(stream);
-      scope.videoElem = videoElem;
-      scope.stream = stream;
-      scope.videoDimensions = false;
-      setTimeout(function () {
-        scope._captureToCanvas.apply(scope, null);
-      }, 500);
-    }, errcb);
-  } else {
-    console.log('Couldn\'t get video from camera');
-  }
+  navigator.getUserMedia(this.videoConstraints, function (stream) {
+    videoElem.src = window.URL.createObjectURL(stream);
+    scope.videoElem = videoElem;
+    scope.stream = stream;
+    scope.videoDimensions = false;
+
+    setTimeout(function () {
+      scope._captureToCanvas.call(scope, cb);
+    }, 500);
+  }, cb);
+
+  return this;
 };
 
 /**
@@ -136,14 +170,16 @@ QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
 QRCodeDecoder.prototype.stop = function() {
   if (this.stream) {
     this.stream.stop();
-    delete this.stream;
+    this.stream = undefined;
   }
-  if (this.tmrCapture) {
-    clearTimeout(this.tmrCapture);
-    delete this.tmrCapture;
-  }
-};
 
+  if (this.timerCapture) {
+    clearTimeout(this.timerCapture);
+    this.timerCapture = undefined;
+  }
+
+  return this;
+};
 
 /**
  * Sets the sourceId for the camera to use.
@@ -157,31 +193,22 @@ QRCodeDecoder.prototype.stop = function() {
  * the current default)
  */
 QRCodeDecoder.prototype.setSourceId = function (sourceId) {
-  if (sourceId) {
-    this.videoConstraints.video = {
-      optional: [{
-        sourceId: sourceId
-      }]
-    };
-  } else {
+  if (sourceId)
+    this.videoConstraints.video = { optional: [{ sourceId: sourceId }]};
+  else
     this.videoConstraints.video = true;
-  }
+
+  return this;
 };
 
-
-/**
- * Sets the callback for the decode event
- */
-QRCodeDecoder.prototype.setDecoderCallback = function (cb) {
-  qrcode.callback = cb;
-};
 
 /**
  * Gets a list of all available video sources on
  * the device
  */
-QRCodeDecoder.prototype.getVideoSources = function(cb) {
+QRCodeDecoder.prototype.getVideoSources = function (cb) {
   var sources = [];
+
   if (MediaStreamTrack && MediaStreamTrack.getSources) {
     MediaStreamTrack.getSources(function (sourceInfos) {
       sourceInfos.forEach(function(sourceInfo) {
@@ -189,14 +216,17 @@ QRCodeDecoder.prototype.getVideoSources = function(cb) {
           sources.push(sourceInfo);
         }
       });
-      cb(sources);
+      cb(null, sources);
     });
   } else {
-    console.log('Your browser doesn\'t support MediaStreamTrack.getSources');
-    cb(sources);
+    cb(new Error('Your browser doesn\'t support MediaStreamTrack.getSources'));
   }
+
+  return this;
 };
 
-QRCodeDecoder.prototype.decodeFromSrc = function(src) {
+QRCodeDecoder.prototype.decodeFromSrc = function (src) {
   qrcode.decode(src);
 };
+
+return QRCodeDecoder; }));

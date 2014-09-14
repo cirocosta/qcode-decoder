@@ -6,8 +6,13 @@
 	"unused": true,
 
 	"laxcomma": true,
+  "expr": true,
 
 	"browser": true,
 	"node": true,
-	"predef": ["qrcode", "MediaStreamTrack"]
+	"predef": [
+    "qrcode",
+    "MediaStreamTrack",
+    "define"
+  ]
 }
