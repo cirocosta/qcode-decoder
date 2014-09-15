@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/cirocosta/qcode-decoder",
   "scripts": {
-    "test": "zuul -- tests/test-qcode-decoder.js"
+    "test": "zuul -- tests/test-qcode-decoder.js",
+    "test-local": "zuul --local 8080 --ui mocha-bdd -- tests/test-qcode-decoder.js"
   },
   "devDependencies": {
     "bower": "^1.3.3",

@@ -31,7 +31,7 @@ Constructor. No args
 var qr = new QCodeDecoder();
 ```
 
-### ::decodeFromImage(img)
+#### ::decodeFromImage(img)
 
 Decodes an image from a source provided or an `<img>` element with a `src` attribute set.
 
@@ -43,18 +43,18 @@ qr.decodeImage(img, function (err, result) {
 });
 ```
 
-### ::decodeFromVideo(videoElem, cb, [,once])
+#### ::decodeFromCamera(videoElem, cb, [,once])
 Decodes from a videoElement. The optional argument **once** makes the *QCodeDecoder* to only find a QRCode once.
 
 ```javascript
-qr.decodeFromVideo(videoElem, function (err) {
+qr.decodeFromCamera(videoElem, function (err) {
   if (err) throw err;
 
   alert(result);
 });
 ```
 
-### ::stop()
+#### ::stop()
 
 Stops the current `qr` from searching for a QRCode.
 

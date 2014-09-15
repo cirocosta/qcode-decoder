@@ -25,7 +25,7 @@
   var img = document.querySelector('img');
 
   btn.onclick = function () {
-    qr.decodeImage(img, function (err, result) {
+    qr.decodeFromImage(img, function (err, result) {
       if (err) throw err;
 
       alert(result);

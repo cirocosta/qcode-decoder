@@ -12,6 +12,9 @@
  * Constructor for QCodeDecoder
  */
 function QCodeDecoder () {
+  if (!(this instanceof QCodeDecoder))
+    return new QCodeDecoder();
+
   this.timerCapture = null;
   this.canvasElem = null;
   this.stream = null;
@@ -60,16 +63,16 @@ QCodeDecoder.prototype.hasGetUserMedia = function () {
  * after the resize if width and height
  * provided.
  */
-QCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
-  if (width && height) {
-    canvasElem.style.width = width + "px";
-    canvasElem.style.height = height + "px";
-    canvasElem.width = width;
-    canvasElem.height = height;
+QCodeDecoder.prototype._prepareCanvas = function (videoElem) {
+  if (!this.canvasElem) {
+    this.canvasElem = document.createElement('canvas');
+    this.canvasElem.style.width = videoElem.videoWidth + "px";
+    this.canvasElem.style.height = videoElem.videoHeight + "px";
+    this.canvasElem.width = videoElem.videoWidth;
+    this.canvasElem.height = videoElem.videoHeight;
   }
 
-  qrcode.setCanvasElement(canvasElem);
-  this.canvasElem = canvasElem;
+  qrcode.setCanvasElement(this.canvasElem);
 
   return this;
 };
@@ -83,32 +86,20 @@ QCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
  * @param  {Function} cb
  * @return {Object}      this
  */
-QCodeDecoder.prototype._captureToCanvas = function (cb, once) {
+QCodeDecoder.prototype._captureToCanvas = function (videoElem, cb, once) {
   if (this.timerCapture)
     clearTimeout(this.timerCapture);
 
-  if (!this.videoDimensions &&
-      this.videoElem.videoWidth &&
-      this.videoElem.videoHeight) {
+  if (videoElem.videoWidth && videoElem.videoHeight) {
+    if (!this.canvasElem)
+      this._prepareCanvas(videoElem);
 
-    this.videoDimensions = {
-      w: this.videoElem.videoWidth,
-      h: this.videoElem.videoHeight
-    };
-
-    this.prepareCanvas(this.canvasElem,
-                       this.videoDimensions.w,
-                       this.videoDimensions.h);
-  }
-
-  if (this.videoDimensions) {
     var gCtx = this.canvasElem.getContext("2d");
-    gCtx.clearRect(0, 0, this.videoElem.videoWidth,
-                         this.videoElem.videoHeight);
-    gCtx.drawImage(this.videoElem, 0, 0,
-                   this.videoDimensions.w,
-                   this.videoDimensions.h);
-
+    gCtx.clearRect(0, 0, videoElem.videoWidth,
+                         videoElem.videoHeight);
+    gCtx.drawImage(videoElem, 0, 0,
+                   videoElem.videoWidth,
+                   videoElem.videoHeight);
     try {
       cb(null, qrcode.decode());
 
@@ -120,20 +111,8 @@ QCodeDecoder.prototype._captureToCanvas = function (cb, once) {
   }
 
   this.timerCapture = setTimeout(function () {
-    this._captureToCanvas.call(this, cb, once);
+    this._captureToCanvas.call(this, videoElem, cb, once);
   }.bind(this), 500);
-};
-
-/**
- * Decodes an image from its src.
- * @param  {DOMNode}   imageElem
- * @param  {Function} cb        callback
- * @return {Object}             this
- */
-QCodeDecoder.prototype.decodeImage = function (img, cb) {
-  img = img.src ? img.src : img;
-
-  return (qrcode.decode(img, cb), this);
 };
 
 /**
@@ -148,10 +127,8 @@ QCodeDecoder.prototype.decodeImage = function (img, cb) {
  *                              called in case of
  *                              error
  */
-QCodeDecoder.prototype.prepareVideo = function (videoElem, cb, once) {
-  var scope = this;
-
-  this.stop();
+QCodeDecoder.prototype.decodeFromCamera = function (videoElem, cb, once) {
+  var scope = (this.stop(), this);
 
   if (!this.hasGetUserMedia())
     cb(new Error('Couldn\'t get video from camera'));
@@ -163,12 +140,33 @@ QCodeDecoder.prototype.prepareVideo = function (videoElem, cb, once) {
     scope.videoDimensions = false;
 
     setTimeout(function () {
-      scope._captureToCanvas.call(scope, cb, once);
+      scope._captureToCanvas.call(scope, videoElem, cb, once);
     }, 500);
   }, cb);
 
   return this;
 };
+
+
+/**
+ * Decodes an image from its src.
+ * @param  {DOMNode}   imageElemvideoElem
+ * @param  {Function} cb        callback
+ * @return {Object}             this
+ */
+QCodeDecoder.prototype.decodeFromImage = function (img, cb) {
+  if (+img.nodeType > 0 && !img.src)
+    throw new Error('The ImageElement must contain a src');
+
+  img = img.src ? img.src : img;
+
+  return (qrcode.decode(img, cb), this);
+};
+
+
+//TODO (ciro)
+// QCodeDecoder.prototype.decodeFromVideo = function () {
+// };
 
 /**
  * Releases a video stream that was being

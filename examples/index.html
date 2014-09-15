@@ -1,63 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>QRCode Decoder</title>
+    <meta charset="UTF-8">
+    <title>QCodeDecoder</title>
   </head>
   <body>
 
-  <canvas width="400" height="400" style="display: none"></canvas>
-  <video autoplay></video>
-  <button id="reset">Reset</button>
-  <button id="stop" >Stop</button>
+    <h1>QCodeDecoder</h1>
+    <h2>Examples</h2>
+    <ul>
+      <li><a href="camera.html">Camera</a></li>
+      <li><a href="image.html">Image</a></li>
+      <li><a href="video.html">Video</a></li>
+    </ul>
 
-  <script src="../build/qcode-decoder.min.js"></script>
-  <script type="text/javascript">
-
-  (function () {
-    'use strict';
-
-    var qr = new QCodeDecoder();
-
-    if (!(qr.isCanvasSupported() && qr.hasGetUserMedia())) {
-      alert('Your browser doesn\'t match the required specs.');
-      throw new Error('Canvas and getUserMedia are required');
-    }
-
-    var video = document.querySelector('video');
-    var canvas = document.querySelector('canvas');
-    var reset = document.querySelector('#reset');
-    var stop = document.querySelector('#stop');
-
-
-    function resultHandler (err, result) {
-      if (err)
-        return console.error(err);
-
-      alert(result);
-    }
-
-    // prepare a canvas element that will receive
-    // the image to decode, sets the callback for
-    // the result and then prepares the
-    // videoElement to send its source to the
-    // decoder.
-
-    qr.prepareCanvas(canvas, 800,600)
-      .prepareVideo(video, resultHandler);
-
-
-    // attach some event handlers to reset and
-    // stop whenever we want.
-
-    reset.onclick = function () {
-      qr.prepareVideo(video, resultHandler);
-    };
-
-    stop.onclick = function () {
-      qr.stop();
-    };
-
-  })();
-  </script>
-</body>
+  </body>
 </html>

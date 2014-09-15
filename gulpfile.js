@@ -59,7 +59,7 @@ gulp.task('hint', function () {
 });
 
 gulp.task('watch', function () {
-  gulp.watch(paths, ['hint', 'build']);
+  gulp.watch(paths.src, ['hint', 'build']);
 });
 
 gulp.task('default', ['hint', 'build']);

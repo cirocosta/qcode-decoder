@@ -17,13 +17,56 @@ describe('QCodeDecoder', function() {
     qr = new QCodeDecoder();
   });
 
-  it('decode image from src', function(done) {
-    qr.decodeImage('tests/assets/qrcode.png', function (err, result) {
+  describe('decodeFromImage', function () {
+    function assertResult (done, err, result) {
       if (err)
         return done(err);
 
       assert.equal(result, '192.168.1.13:3000');
       done();
+    }
+
+    it('decode image from src', function (done) {
+      qr.decodeFromImage('tests/assets/qrcode.png',
+                         assertResult.bind(null, done));
+    });
+
+    it('not decode image from src w/ non-qrcode img', function (done) {
+      qr.decodeFromImage('tests/assets/duck.jpg', function (err, result) {
+        assert(err);
+        done();
+      });
+    });
+
+    it('decode image from img element', function (done) {
+      var img = document.createElement('img');
+      img.setAttribute('src', 'tests/assets/qrcode.png');
+
+      qr.decodeFromImage(img, assertResult.bind(null, done));
+    });
+
+    it('throw if no src in image element', function() {
+      var img = document.createElement('img');
+
+      assert.throws(function () {
+        qr.decodeFromImage(img);
+      });
+    });
+  });
+
+  describe('decodeFromCamera', function () {
+    it('decode from a video with qrcode', function (done) {
+      var video = document.createElement('video');
+      video.setAttribute('autoplay', true);
+      video.setAttribute('loop', true);
+      video.setAttribute('src', 'tests/assets/qrcode-video.mp4');
+
+      qr.decodeFromCamera(video, function (err, result) {
+        if (err) done(err);
+
+        assert.equal(result, '192.168.1.13:3000');
+        done();
+      }, true);
     });
   });
 });
