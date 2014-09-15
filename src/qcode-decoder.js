@@ -1,149 +1,194 @@
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd)
+    define(['qrcode'], factory);
+  else if (typeof exports === 'object')
+    module.exports = factory(require('../build/qrcode'));
+  else root.QCodeDecoder = factory(qrcode);
+}(this, function (qrcode) {
+
+'use strict';
+
 /**
- * Constructor for QRCodeDecoder
+ * Constructor for QCodeDecoder
  */
-function QRCodeDecoder () {
-  this.tmrCapture = null;
+function QCodeDecoder () {
+  if (!(this instanceof QCodeDecoder))
+    return new QCodeDecoder();
+
+  this.timerCapture = null;
   this.canvasElem = null;
+  this.stream = null;
   this.videoConstraints = {video: true, audio: false};
 }
+
+/**
+ * Verifies if canvas element is supported.
+ */
+QCodeDecoder.prototype.isCanvasSupported = function () {
+  var elem = document.createElement('canvas');
+
+  return !!(elem.getContext && elem.getContext('2d'));
+};
+
+
+/**
+ * Normalizes and Verifies if the user has
+ * getUserMedia enabled in the browser.
+ */
+QCodeDecoder.prototype.hasGetUserMedia = function () {
+  navigator.getUserMedia = navigator.getUserMedia ||
+                           navigator.webkitGetUserMedia ||
+                           navigator.mozGetUserMedia ||
+                           navigator.msGetUserMedia;
+
+  return !!(navigator.getUserMedia);
+};
 
 /**
  * Prepares the canvas element (which will
  * receive the image from the camera and provide
  * what the algorithm needs for checking for a
  * QRCode and then decoding it.)
+ *
+ *
  * @param  {DOMElement} canvasElem the canvas
- * element
+ *                                 element
  * @param  {number} width      The width that
- * the canvas element should have
+ *                             the canvas element
+ *                             should have
  * @param  {number} height     The height that
- * the canvas element should have
+ *                             the canvas element
+ *                             should have
  * @return {DOMElement}            the canvas
  * after the resize if width and height
  * provided.
  */
-QRCodeDecoder.prototype.prepareCanvas = function (canvasElem, width, height) {
-  if (width && height) {
-    canvasElem.style.width = width + "px";
-    canvasElem.style.height = height + "px";
-    canvasElem.width = width;
-    canvasElem.height = height;
+QCodeDecoder.prototype._prepareCanvas = function (videoElem) {
+  if (!this.canvasElem) {
+    this.canvasElem = document.createElement('canvas');
+    this.canvasElem.style.width = videoElem.videoWidth + "px";
+    this.canvasElem.style.height = videoElem.videoHeight + "px";
+    this.canvasElem.width = videoElem.videoWidth;
+    this.canvasElem.height = videoElem.videoHeight;
   }
 
-  qrcode.setCanvasElement(canvasElem);
-  this.canvasElem = canvasElem;
+  qrcode.setCanvasElement(this.canvasElem);
 
-  return canvasElem;
+  return this;
 };
 
-QRCodeDecoder.prototype._captureToCanvas = function () {
-  var scope = this;
+/**
+ * Based on the video dimensions and the canvas
+ * that was previously generated captures the
+ * video/image source and then paints into the
+ * canvas so that the decoder is able to work as
+ * it expects.
+ * @param  {Function} cb
+ * @return {Object}      this
+ */
+QCodeDecoder.prototype._captureToCanvas = function (videoElem, cb, once) {
+  if (this.timerCapture)
+    clearTimeout(this.timerCapture);
 
-  if (this.tmrCapture) {
-    clearTimeout(this.tmrCapture);
-  }
+  if (videoElem.videoWidth && videoElem.videoHeight) {
+    if (!this.canvasElem)
+      this._prepareCanvas(videoElem);
 
-  if (!this.videoDimensions &&
-      this.videoElem.videoWidth &&
-      this.videoElem.videoHeight) {
-
-    this.videoDimensions = {
-      w: this.videoElem.videoWidth,
-      h: this.videoElem.videoHeight
-    };
-
-    this.prepareCanvas(this.canvasElem,
-                       this.videoDimensions.w,
-                       this.videoDimensions.h);
-  }
-
-  if (this.videoDimensions) {
     var gCtx = this.canvasElem.getContext("2d");
-    gCtx.clearRect(0, 0, this.videoElem.videoWidth,
-                         this.videoElem.videoHeight);
+    gCtx.clearRect(0, 0, videoElem.videoWidth,
+                         videoElem.videoHeight);
+    gCtx.drawImage(videoElem, 0, 0,
+                   videoElem.videoWidth,
+                   videoElem.videoHeight);
+    try {
+      cb(null, qrcode.decode());
 
-    try{
-      gCtx.drawImage(this.videoElem, 0, 0,
-                     this.videoDimensions.w,
-                     this.videoDimensions.h);
-      qrcode.decode();
-      return;
-    }
-    catch(e){
-        console.log(e);
+      if (once) return;
+    } catch (err){
+      if (err !== "Couldn't find enough finder patterns")
+        cb(new Error(err));
     }
   }
-  this.tmrCapture = setTimeout(function () {
-    scope._captureToCanvas.apply(scope, null);
-  }, 500);
-};
 
-/**
- * Verifies if the user has getUserMedia enabled
- * in the browser.
- */
-QRCodeDecoder.prototype.hasGetUserMedia = function () {
-  return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia || navigator.msGetUserMedia);
-};
-
-/**
- * Verifies if canvas element is supported.
- */
-QRCodeDecoder.prototype.isCanvasSupported = function () {
-  var elem = document.createElement('canvas');
-
-  return !!(elem.getContext && elem.getContext('2d'));
+  this.timerCapture = setTimeout(function () {
+    this._captureToCanvas.call(this, videoElem, cb, once);
+  }.bind(this), 500);
 };
 
 /**
  * Prepares the video element for receiving
- * camera's input.
+ * camera's input. Releases a stream if there
+ * was any (resets).
+ *
  * @param  {DOMElement} videoElem <video> dom
- * element
+ *                                element
  * @param  {Function} errcb     callback
- * function to be called in case of error
+ *                              function to be
+ *                              called in case of
+ *                              error
  */
-QRCodeDecoder.prototype.prepareVideo = function(videoElem, errcb) {
-  var scope = this;
+QCodeDecoder.prototype.decodeFromCamera = function (videoElem, cb, once) {
+  var scope = (this.stop(), this);
 
-  this.stop();
+  if (!this.hasGetUserMedia())
+    cb(new Error('Couldn\'t get video from camera'));
 
-  navigator.getUserMedia = navigator.getUserMedia ||
-      navigator.webkitGetUserMedia ||
-      navigator.mozGetUserMedia ||
-      navigator.msGetUserMedia;
+  navigator.getUserMedia(this.videoConstraints, function (stream) {
+    videoElem.src = window.URL.createObjectURL(stream);
+    scope.videoElem = videoElem;
+    scope.stream = stream;
+    scope.videoDimensions = false;
 
-  if (navigator.getUserMedia) {
-    navigator.getUserMedia(this.videoConstraints, function (stream) {
-      videoElem.src = window.URL.createObjectURL(stream);
-      scope.videoElem = videoElem;
-      scope.stream = stream;
-      scope.videoDimensions = false;
-      setTimeout(function () {
-        scope._captureToCanvas.apply(scope, null);
-      }, 500);
-    }, errcb);
-  } else {
-    console.log('Couldn\'t get video from camera');
-  }
+    setTimeout(function () {
+      scope._captureToCanvas.call(scope, videoElem, cb, once);
+    }, 500);
+  }, cb);
+
+  return this;
 };
+
+QCodeDecoder.prototype.decodeFromVideo = function (videoElem, cb, once) {
+  setTimeout(function () {
+    this._captureToCanvas.call(this, videoElem, cb, once);
+  }.bind(this), 500);
+
+  return this;
+};
+
+/**
+ * Decodes an image from its src.
+ * @param  {DOMNode}   imageElemvideoElem
+ * @param  {Function} cb        callback
+ * @return {Object}             this
+ */
+QCodeDecoder.prototype.decodeFromImage = function (img, cb) {
+  if (+img.nodeType > 0 && !img.src)
+    throw new Error('The ImageElement must contain a src');
+
+  img = img.src ? img.src : img;
+
+  return (qrcode.decode(img, cb), this);
+};
+
+
 
 /**
  * Releases a video stream that was being
  * captured by prepareToVideo
  */
-QRCodeDecoder.prototype.stop = function() {
+QCodeDecoder.prototype.stop = function() {
   if (this.stream) {
     this.stream.stop();
-    delete this.stream;
+    this.stream = undefined;
   }
-  if (this.tmrCapture) {
-    clearTimeout(this.tmrCapture);
-    delete this.tmrCapture;
-  }
-};
 
+  if (this.timerCapture) {
+    clearTimeout(this.timerCapture);
+    this.timerCapture = undefined;
+  }
+
+  return this;
+};
 
 /**
  * Sets the sourceId for the camera to use.
@@ -156,47 +201,37 @@ QRCodeDecoder.prototype.stop = function() {
  * video source you want to use (or false to use
  * the current default)
  */
-QRCodeDecoder.prototype.setSourceId = function (sourceId) {
-  if (sourceId) {
-    this.videoConstraints.video = {
-      optional: [{
-        sourceId: sourceId
-      }]
-    };
-  } else {
+QCodeDecoder.prototype.setSourceId = function (sourceId) {
+  if (sourceId)
+    this.videoConstraints.video = { optional: [{ sourceId: sourceId }]};
+  else
     this.videoConstraints.video = true;
-  }
+
+  return this;
 };
 
-
-/**
- * Sets the callback for the decode event
- */
-QRCodeDecoder.prototype.setDecoderCallback = function (cb) {
-  qrcode.callback = cb;
-};
 
 /**
  * Gets a list of all available video sources on
  * the device
  */
-QRCodeDecoder.prototype.getVideoSources = function(cb) {
+QCodeDecoder.prototype.getVideoSources = function (cb) {
   var sources = [];
+
   if (MediaStreamTrack && MediaStreamTrack.getSources) {
     MediaStreamTrack.getSources(function (sourceInfos) {
       sourceInfos.forEach(function(sourceInfo) {
-        if (sourceInfo.kind === 'video') {
+        if (sourceInfo.kind === 'video')
           sources.push(sourceInfo);
-        }
       });
-      cb(sources);
+      cb(null, sources);
     });
   } else {
-    console.log('Your browser doesn\'t support MediaStreamTrack.getSources');
-    cb(sources);
+    cb(new Error('Current browser doest not support MediaStreamTrack.getSources'));
   }
+
+  return this;
 };
 
-QRCodeDecoder.prototype.decodeFromSrc = function(src) {
-  qrcode.decode(src);
-};
+
+return QCodeDecoder; }));

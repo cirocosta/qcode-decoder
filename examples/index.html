@@ -1,43 +1,18 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>QRCode Decoder</title>
-	</head>
-	<body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>QCodeDecoder</title>
+  </head>
+  <body>
 
-	<canvas width="400" height="400" style="display: none"></canvas>
-	<video autoplay></video>
-	<button id="reset">Reset</button>
-	<button id="stop" >Stop</button>
+    <h1>QCodeDecoder</h1>
+    <h2>Examples</h2>
+    <ul>
+      <li><a href="camera.html">Camera</a></li>
+      <li><a href="image.html">Image</a></li>
+      <li><a href="video.html">Video</a></li>
+    </ul>
 
-	<script src="../build/qcode-decoder.min.js"></script>
-	<script type="text/javascript">
-		var qr = new QRCodeDecoder();
-
-		if (qr.isCanvasSupported() || qr.hasGetUserMedia()) {
-		  qr.prepareCanvas(document.querySelector('canvas'), 800,600);
-		  qr.setDecoderCallback(function (a) {
-		    console.log(a);
-		  });
-		}
-
-		function errCb (err) {
-			console.error(err);
-		}
-
-		qr.getVideoSources(function(sources) {
-			qr.prepareVideo(document.querySelector('video'), errCb);
-		});
-
-
-		document.querySelector('#reset').onclick = function () {
-		  qr.prepareVideo(document.querySelector('video'), errCb);
-		}
-
-		document.querySelector('#stop').onclick = function () {
-			qr.stop();
-		};
-
-	</script>
-</body>
+  </body>
 </html>
