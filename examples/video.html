@@ -6,8 +6,19 @@
 </head>
 <body>
 
+  <video src="../tests/assets/qrcode-video.mp4" autoplay></video>
+
   <script src="../build/qcode-decoder.min.js"></script>
   <script type="text/javascript">
+  var video = document.querySelector('video');
+  var once = true;
+
+  QCodeDecoder()
+    .decodeFromVideo(video, function (err, result) {
+      if (err) throw err;
+
+      alert(result);
+    }, once);
   </script>
 </body>
 </html>

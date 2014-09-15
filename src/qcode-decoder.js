@@ -147,6 +147,13 @@ QCodeDecoder.prototype.decodeFromCamera = function (videoElem, cb, once) {
   return this;
 };
 
+QCodeDecoder.prototype.decodeFromVideo = function (videoElem, cb, once) {
+  setTimeout(function () {
+    this._captureToCanvas.call(this, videoElem, cb, once);
+  }.bind(this), 500);
+
+  return this;
+};
 
 /**
  * Decodes an image from its src.
@@ -164,9 +171,6 @@ QCodeDecoder.prototype.decodeFromImage = function (img, cb) {
 };
 
 
-//TODO (ciro)
-// QCodeDecoder.prototype.decodeFromVideo = function () {
-// };
 
 /**
  * Releases a video stream that was being

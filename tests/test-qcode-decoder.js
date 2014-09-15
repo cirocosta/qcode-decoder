@@ -58,10 +58,9 @@ describe('QCodeDecoder', function() {
     it('decode from a video with qrcode', function (done) {
       var video = document.createElement('video');
       video.setAttribute('autoplay', true);
-      video.setAttribute('loop', true);
       video.setAttribute('src', 'tests/assets/qrcode-video.mp4');
 
-      qr.decodeFromCamera(video, function (err, result) {
+      qr.decodeFromVideo(video, function (err, result) {
         if (err) done(err);
 
         assert.equal(result, '192.168.1.13:3000');

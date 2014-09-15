@@ -22,26 +22,43 @@ and use it!
 
 **For a full example, see `/examples` or [this plunkr](http://plnkr.co/aWikiL)**
 
-The API is Pretty simples
+The API is Pretty simple:
 
 ### QCodeDecoder()
-Constructor. No args
+Constructor. No args. Might be create with or without `new`.
 
 ```javascript
 var qr = new QCodeDecoder();
+// or
+var qr = QCodeDecoder();
 ```
+
+This construction lets us be able to chain some methods (although not very necessary - the API is **really** simple).
 
 #### ::decodeFromImage(img)
 
 Decodes an image from a source provided or an `<img>` element with a `src` attribute set.
 
 ```javascript
-qr.decodeImage(img, function (err, result) {
+qr.decodeFromImage(img, function (err, result) {
   if (err) throw err;
 
   alert(result);
 });
 ```
+
+#### ::decodeFromVideo(videoElem, cb, [,once])
+Decodes directly from a video with a well specified `src` attribute
+
+```javascript
+QCodeDecoder()
+  .decodeFromVideo(document.querySelector('video'), function (err, result) {
+    if (err) throw err;
+
+    alert(result);
+  }, true);
+```
+
 
 #### ::decodeFromCamera(videoElem, cb, [,once])
 Decodes from a videoElement. The optional argument **once** makes the *QCodeDecoder* to only find a QRCode once.
