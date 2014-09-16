@@ -213,22 +213,25 @@ QCodeDecoder.prototype.setSourceId = function (sourceId) {
 
 /**
  * Gets a list of all available video sources on
- * the device
+ * the current device.
+ * @param {Function} cb callback to be resolved
+ * with error (first param) ou results (second
+ * param) - a list containing all of the sources
+ * that are of the 'video' kind.
  */
 QCodeDecoder.prototype.getVideoSources = function (cb) {
   var sources = [];
 
-  if (MediaStreamTrack && MediaStreamTrack.getSources) {
-    MediaStreamTrack.getSources(function (sourceInfos) {
-      sourceInfos.forEach(function(sourceInfo) {
-        if (sourceInfo.kind === 'video')
-          sources.push(sourceInfo);
-      });
-      cb(null, sources);
+  if (!(MediaStreamTrack && MediaStreamTrack.getSources))
+    return cb(new Error('Current browser doest not support MediaStreamTrack.getSources'));
+
+  MediaStreamTrack.getSources(function (sourceInfos) {
+    sourceInfos.forEach(function(sourceInfo) {
+      if (sourceInfo.kind === 'video')
+        sources.push(sourceInfo);
     });
-  } else {
-    cb(new Error('Current browser doest not support MediaStreamTrack.getSources'));
-  }
+    cb(null, sources);
+  });
 
   return this;
 };

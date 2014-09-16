@@ -5,7 +5,7 @@ var QCodeDecoder = require('../src/qcode-decoder');
 
 describe('QCodeDecoder', function() {
   global.mocha.checkLeaks = false;
-  this.timeout(20000);
+  this.timeout(180000);
 
   it('be defined', function () {
     assert(!!QCodeDecoder);

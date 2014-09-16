@@ -9,6 +9,7 @@ var fs = require('fs')
   , concat = require('gulp-concat')
   , uglify = require('gulp-uglify')
   , jshint = require('gulp-jshint')
+  , livereload = require('gulp-livereload')
   , sourcemaps = require('gulp-sourcemaps');
 
 
@@ -59,7 +60,14 @@ gulp.task('hint', function () {
 });
 
 gulp.task('watch', function () {
-  gulp.watch(paths.src, ['hint', 'build']);
+  var changeHandler = function (){};
+
+  if (process.argv[3] === '--livereload')
+    (livereload.listen(),
+     changeHandler = livereload.changed);
+
+  gulp.watch(paths.src, ['hint', 'build'])
+    .on('change', changeHandler);
 });
 
 gulp.task('default', ['hint', 'build']);

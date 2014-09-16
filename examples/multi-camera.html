@@ -5,59 +5,65 @@
   </head>
   <body>
 
-  <canvas width="400" height="400" style="display: none"></canvas>
   <video autoplay></video>
   <select id="cameraSelect"></select>
   <button id="reset">Reset</button>
   <button id="stop" >Stop</button>
 
-  <p id="multi-camera-message"></p>
+  <p id="result"></p>
 
   <script src="../build/qcode-decoder.min.js"></script>
   <script type="text/javascript">
     var qr = new QCodeDecoder();
-
-    if (qr.isCanvasSupported() || qr.hasGetUserMedia()) {
-      qr.prepareCanvas(document.querySelector('canvas'), 800,600);
-      qr.setDecoderCallback(function (a) {
-        console.log(a);
-      });
-    }
-
-    function errCb (err) {
-      console.error(err);
-    }
-
-    qr.getVideoSources(function(sources) {
-      var sel = document.getElementById('cameraSelect');
-      if (sources.length) {
-        sources.forEach(function(source) {
-          var option = document.createElement('option');
-          option.value = source.id;
-          option.text = source.facing || 'default';
-          sel.add(option);
-        });
-        sel.onchange = function() {
-          qr.setSourceId(sel.selectedOptions[0].value);
-          qr.prepareVideo(document.querySelector('video'), errCb);
-        };
-        document.getElementById('multi-camera-message').innerHTML = 'Your browser is currently exposing ' + sources.length + ' cameras - use the dropdown above to select which you want to use';
-        sel.onchange();
-      } else {
-        sel.remove();
-        qr.prepareVideo(document.querySelector('video'), errCb);
-        document.getElementById('multi-camera-message').innerHTML = 'Your browser does not support getting info on the available cameras via Javascript';
-      }
-    });
-
-
-    document.querySelector('#reset').onclick = function () {
-      qr.prepareVideo(document.querySelector('video'), errCb);
-    }
-
-    document.querySelector('#stop').onclick = function () {
-      qr.stop();
+    var elems = {
+      selector : document.querySelector('select'),
+      reset : document.getElementById('reset'),
+      stop : document.getElementById('reset'),
+      video: document.querySelector('video'),
+      result: document.getElementById('result')
     };
+
+    if (!(qr.isCanvasSupported() && qr.hasGetUserMedia())) {
+      alert('Your browser doesn\'t match the required specs.');
+      throw new Error('Canvas and getUserMedia are required');
+    }
+
+    function resultHandler (err, result) {
+      if (err)
+        return console.log(err.message);
+
+      alert(result);
+    }
+
+    qr.getVideoSources(function (err, sources) {
+      if (err || (sources && !sources.length)) {
+        elems.selector.remove();
+        qr.decodeFromCamera(elems.video, resultHandler);
+
+        return;
+      }
+
+      sources.forEach(function (source) {
+        var option = document.createElement('option');
+        option.value = source.id;
+        option.text = source.facing || 'default';
+
+        elems.selector.add(option);
+      });
+
+      elems.selector.onchange = function () {
+        qr.setSourceId(elems.selector.selectedOptions[0].value);
+      };
+
+      elems.result.innerHTML = 'Your browser is currently exposing ' +
+                                sources.length + ' cameras - use the ' +
+                                'dropdown above to select which you want ' +
+                                'to use';
+
+      elems.selector.onchange();
+
+      qr.decodeFromCamera(elems.video, resultHandler);
+    });
 
   </script>
 </body>
