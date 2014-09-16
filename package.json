@@ -1,0 +1,29 @@
+{
+  "name": "qcode-decoder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cirocosta/qcode-decoder.git"
+  },
+  "author": "Ciro S. Costa <ciro9758@gmail.com> (http://cirocosta.github.io/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cirocosta/qcode-decoder/issues"
+  },
+  "scripts": {
+    "build": "gulp build"
+  },
+  "homepage": "https://github.com/cirocosta/qcode-decoder",
+  "devDependencies": {
+    "gulp": "^3.8.8",
+    "gulp-concat": "^2.4.0",
+    "gulp-csso": "^0.2.9",
+    "gulp-htmlmin": "^0.2.0",
+    "gulp-livereload": "^2.1.1",
+    "gulp-sass": "^0.7.3",
+    "gulp-sourcemaps": "^1.1.5",
+    "gulp-uglify": "^1.0.1"
+  }
+}
