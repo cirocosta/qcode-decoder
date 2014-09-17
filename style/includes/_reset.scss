@@ -1,0 +1,13 @@
+@import 'base';
+
+html {
+  font-size: $base__font-size;
+}
+
+body {
+  font-family: $base__font;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}

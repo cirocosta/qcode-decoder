@@ -1,0 +1,41 @@
+@import 'base';
+
+$grid__columns--number: 6;
+
+// set the width/max-width of our inner content
+
+.grid-container {
+  width: 100%;
+  max-width: 120rem;
+}
+
+
+// do not let content overflow onto other rows
+
+.row:before,
+.row:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+// by floating we are able to position coluns side
+// by side. With a small min-height we have a
+// guarantee that things won't stack on top of
+// each other.
+
+@mixin col($index) {
+  float: left;
+  min-height: .1rem;
+
+  width: ($index * (100 / $grid__columns--number)) * 1%;
+
+  padding: 1.2rem;
+}
+
+
+@for $i from 1 through $grid__columns--number {
+  .col-#{$i} {
+    @include col($i);
+  }
+}

@@ -1,0 +1,21 @@
+@import 'includes/base';
+@import 'includes/reset';
+@import 'includes/text';
+@import 'includes/grid';
+
+body {
+  margin: auto;
+  width: 60rem;
+}
+
+@media (max-width: 630px) {
+  body {
+    width: 36rem;
+  }
+}
+
+@media (min-width: 1000px) {
+  body {
+    width: 80rem;
+  }
+}

@@ -10,6 +10,7 @@
   <meta property="og:title" content="QCodeDecoder">
   <meta property="og:description" content="Browser-ready QR Code decoder in Javascript">
 	<title>QCodeDecoder</title>
+  <link rel="stylesheet" href="dist/css/main.css">
 </head>
 <body>
   <header>
@@ -18,69 +19,81 @@
     <p>Using Lazar Laszlo's port of ZXing Java library, QCodeDecoder brings to the web a great interface for dealing with QRCode decoding, being usable both on desktops and mobile phones. <a href="#">See the compatibility table</a></p>
   </header>
 
-  <section class="install">
-    <h3>Install</h3>
+  <main class="grid-container">
 
-    <p>Installing the lib is super damn easy. Just downloaded it and include in your page or fetch it using <a href="http://bower.io/">Bower</a>, the package manager for the frontend.</p>
+    <section class="install">
+      <h3>Install</h3>
 
-    <code>$ bower install -s qcode-decoder</code>
+      <div class="row">
+        <div class="col-3">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab repellendus, tempore dolore esse omnis consequatur aliquam molestiae fuga vitae, error beatae placeat id dicta in quis ea ad, doloremque. Necessitatibus.</p>
+        </div>
+        <div class="col-3">
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quae omnis doloribus nobis repudiandae in accusamus, at earum quaerat consectetur, soluta molestias! Obcaecati natus nesciunt facere, laborum non exercitationem saepe numquam.</p>
+        </div>
+      </div>
 
-    <p>Don't forget to contribute to the project! Go <a href="https://github.com/cirocosta/qcode-decoder">fork it on Github</a></p>
-  </section>
+      <p>Installing the lib is super damn easy. Just downloaded it and include in your page or fetch it using <a href="http://bower.io/">Bower</a>, the package manager for the frontend.</p>
 
-  <section id="samples">
-    <article>
-      <p>QCodeDecoder keeps everything simpe, trying to do well for only a few things.</p>
-      <p>There are mainly three things to do with the library: decode a qr-code directly from camera (i.e, the phone's front/back camera, your webcam or whatever), from a video or from an image.</p>
+      <code>$ bower install -s qcode-decoder</code>
 
-      <section id="image">
-        <p>The simplest case is decoding from an image. It only requires passing to the <code>decodeFromImage</code> method the image's source or an image element that has a <code>src</code> attribute set.</p>
+      <p>Don't forget to contribute to the project! Go <a href="https://github.com/cirocosta/qcode-decoder">fork it on Github</a></p>
+    </section>
 
-        <aside>
-          <button>Decode!</button>
-          <img src="dist/assets/qrcode.png" alt="qr-code image" />
+    <section id="samples">
+      <article>
+        <p>QCodeDecoder keeps everything simpe, trying to do well for only a few things.</p>
+        <p>There are mainly three things to do with the library: decode a qr-code directly from camera (i.e, the phone's front/back camera, your webcam or whatever), from a video or from an image.</p>
 
-          <pre>
-var image = document.getElementById("image");
-QCodeDecoder()
-  .decodeFromImage(image, function (error, result) {
-    console.log(result);
-  });
-          </pre>
-        </aside>
-      </section>
+        <section id="image">
+          <p>The simplest case is decoding from an image. It only requires passing to the <code>decodeFromImage</code> method the image's source or an image element that has a <code>src</code> attribute set.</p>
 
-      <section id="video">
-        <p>Just like decoding from camera, a video can also contain a QRCode in it. Although not the common case, it is also exposed as it is a part of the Camera code.</p>
-      </section>
+          <aside>
+            <button>Decode!</button>
+            <img src="dist/assets/qrcode.png" alt="qr-code image" />
 
-      <section id="camera">
-        <p>Decoding from camera requires, firstly, access to the user's camera. For getting this, QCodeDecoder will ask the user about it (this process is required so that browsers are able to keep it secure) and, if conceived, start searching for a valid QRCode to decode.</p>
+            <pre>
+  var image = document.getElementById("image");
+  QCodeDecoder()
+    .decodeFromImage(image, function (error, result) {
+      console.log(result);
+    });
+            </pre>
+          </aside>
+        </section>
 
-        <aside class="note">
-          <p>Note that if you need to have a valid QRCode and a camera to try this one. If you don't have, check the <a href="">video sample</a>.</p>
-        </aside>
+        <section id="video">
+          <p>Just like decoding from camera, a video can also contain a QRCode in it. Although not the common case, it is also exposed as it is a part of the Camera code.</p>
+        </section>
 
-        <aside>
-          <video autoplay id="camera-demo"></video>
-          <button>Start capturing</button>
-          <pre>
-var video = document.getElementById('video');
+        <section id="camera">
+          <p>Decoding from camera requires, firstly, access to the user's camera. For getting this, QCodeDecoder will ask the user about it (this process is required so that browsers are able to keep it secure) and, if conceived, start searching for a valid QRCode to decode.</p>
 
-QCodeDecoder()
-  .decodeFromCamera(video, function (error, result) {
-    if (error) throw error;
+          <aside class="note">
+            <p>Note that if you need to have a valid QRCode and a camera to try this one. If you don't have, check the <a href="">video sample</a>.</p>
+          </aside>
 
-    console.log(result);
-  });
-          </pre>
-        </aside>
-      </section>
-    </article>
-  </section>
+          <aside>
+            <video autoplay id="camera-demo"></video>
+            <button>Start capturing</button>
+            <pre>
+  var video = document.getElementById('video');
+
+  QCodeDecoder()
+    .decodeFromCamera(video, function (error, result) {
+      if (error) throw error;
+
+      console.log(result);
+    });
+            </pre>
+          </aside>
+        </section>
+      </article>
+    </section>
+  </main>
 
   <footer>
-    <p>see on github</p>
+    <p><a href="https://github.com/cirocosta/qcode-decoder">see on github</a></p>
   </footer>
   <script src="dist/main.js"></script>
 </body>
