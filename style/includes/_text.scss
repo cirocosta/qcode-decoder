@@ -9,31 +9,54 @@
 }
 
 header {
-  h1, h2, h3 {
+  h1, h2, h3, h4 {
     text-align: center;
     margin: auto;
-    width: 30rem;
+    width: 36rem;
+  }
+
+  p {
+    text-align: center;
+    font-style: italic;
   }
 }
 
 h1 {
-  @include text(4rem, 5rem, 2rem, $color__base, bolder);
+  @include text(4.5rem, 7rem, 2rem, $color__base, bolder);
 }
 
 h2 {
-  @include text(2.4rem, 1rem, 3rem, $color__base--light, bold);
+  @include text(3rem, 1rem, 5rem, $color__base--light, bold);
 }
 
 h3 {
+  @include text(2.5rem, .5rem, .5rem, $color__base--light, bold);
+}
+
+h4 {
   @include text(2rem, .5rem, .5rem, $color__base--light, bold);
 }
 
-a {
-  color: $color__base--light;
+h1 > a:hover,
+h2 > a:hover,
+h3 > a:hover,
+h4 > a:hover {
   text-decoration: none;
 }
 
 p {
   color: $color__base--darker;
   font-size: 1.8rem;
+  text-align: justify;
+  line-height: 1.3;
 }
+
+a {
+  color: $color__base--light;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+

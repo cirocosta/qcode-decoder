@@ -1,10 +1,10 @@
 @import 'base';
 
-$grid__columns--number: 6;
+$grid__columns--number: 8;
 
 // set the width/max-width of our inner content
 
-.grid-container {
+.grid {
   width: 100%;
   max-width: 120rem;
 }
@@ -12,8 +12,8 @@ $grid__columns--number: 6;
 
 // do not let content overflow onto other rows
 
-.row:before,
-.row:after {
+.grid__row:before,
+.grid__row:after {
   content: '';
   display: table;
   clear: both;
@@ -30,12 +30,25 @@ $grid__columns--number: 6;
 
   width: ($index * (100 / $grid__columns--number)) * 1%;
 
+  // @if $index % 2 {
+  //   padding-right: 1.2rem;
+  // } @else {
+  //   padding-left: 1.4rem;
+  // }
   padding: 1.2rem;
 }
 
 
 @for $i from 1 through $grid__columns--number {
-  .col-#{$i} {
+  .grid__col--#{$i} {
     @include col($i);
+  }
+}
+
+@media all and (max-width:800px){
+  @for $i from 1 through $grid__columns--number {
+    .grid__col--#{$i} {
+      width: 100%;
+    }
   }
 }
