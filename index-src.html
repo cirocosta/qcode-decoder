@@ -49,9 +49,9 @@
           <p>The simplest case is decoding from an image. It only requires passing to the <code>decodeFromImage</code> method the image's source or an image element that has a <code>src</code> attribute set.</p>
 
           <aside>
-            <div class="sample__image grid__col--2">
+            <div class="sample grid__col--2">
               <img src="dist/assets/qrcode.png" alt="qr-code image" />
-              <p><button class="base__button">Decode!</button></p>
+              <p><button class="btn" class="base__button">Decode!</button></p>
             </div>
             <div class="grid__col--6">
               <pre class="prettyprint">
@@ -72,9 +72,11 @@ QCodeDecoder()
           <p>Just like decoding from camera, a video can also contain a QRCode in it. Although not the common case, it is also exposed as it is a part of the Camera code.</p>
 
           <aside>
-            <div class="sample__video grid__col--2">
+            <div class="sample grid__col--2">
               <video id="video-demo" src="dist/assets/qrcode-video.mp4" controls preload></video>
-              <button>Play</button>
+              <p>
+                <button class="btn">Play</button>
+              </p>
             </div>
             <div class="grid__col--6">
               <pre class="prettyprint">
@@ -99,9 +101,11 @@ QCodeDecoder()
           </aside>
 
           <aside>
-            <div class="sample__camera grid__col--2">
+            <div class="sample grid__col--2">
               <video autoplay id="camera-demo" poster="dist/assets/webcam.png"></video>
-              <button>Capture</button>
+              <p>
+                <button class="btn">Capture</button>
+              </p>
             </div>
             <div class="grid__col--6">
               <pre class="prettyprint">

@@ -3,70 +3,23 @@
 @import 'includes/text';
 @import 'includes/grid';
 
-body {
-  margin: auto;
-  width: 60rem;
-}
-
-@media (max-width: 630px) {
-  body {
-    width: 36rem;
-  }
-}
-
-@media (min-width: 1000px) {
-  body {
-    width: 80rem;
-  }
-}
-
-main > section {
-  margin-top: 5rem;
-}
-
-code {
-  background-color: $color__background--light;
-  font-size: 1.8rem;
-  color: $color__base;
-  padding: 0.4rem;
-  line-height: 1.9;
-  border-radius: 0.5rem;
-  overflow: auto;
-}
-
-pre {
-  font-size: 2rem;
-  padding: 1rem;
-  border-radius: .4rem;
-  overflow: auto;
-}
-
-footer p {
-  padding: 2rem;
+.sample,
+.sample p {
   text-align: center;
 }
 
-.sample__image,
-.sample__camera,
-.sample__video,
-.sample__image p {
-  text-align: center;
-}
-
-.sample__camera video,
-.sample__video video {
+.sample video {
   margin-bottom: 2rem;
   margin-top: 2rem;
 }
 
-.sample__camera video,
-.sample__video video,
-.sample__image img {
+.sample video,
+.sample img {
   max-width: 13rem;
   max-height: 13rem;
 }
 
-button {
+.btn {
   padding: 1rem 1.9rem;
   font-size: 1.7rem;
   line-height: 1.471;

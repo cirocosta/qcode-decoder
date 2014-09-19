@@ -11,3 +11,46 @@ body {
 *, *:before, *:after {
   box-sizing: border-box;
 }
+
+body {
+  margin: auto;
+  width: 60rem;
+}
+
+@media (max-width: 630px) {
+  body {
+    width: 36rem;
+  }
+}
+
+@media (min-width: 1000px) {
+  body {
+    width: 80rem;
+  }
+}
+
+main > section {
+  margin-top: 5rem;
+}
+
+code {
+  background-color: $color__background--light;
+  font-size: 1.8rem;
+  color: $color__base;
+  padding: 0.4rem;
+  line-height: 1.9;
+  border-radius: 0.5rem;
+  overflow: auto;
+}
+
+pre {
+  font-size: 2rem;
+  padding: 1rem;
+  border-radius: .4rem;
+  overflow: auto;
+}
+
+footer p {
+  padding: 2rem;
+  text-align: center;
+}
