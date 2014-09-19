@@ -3,10 +3,10 @@ browsers:
   - name: chrome
     version: latest
   - name: firefox
-    version: 27..latest
+    version: latest
   - name: ie
-    version: 9..latest
+    version: latest
   - name: iphone
-    version: 6.1..latest
+    version: latest
   - name: android
-    version: 4.0..latest
+    version: latest

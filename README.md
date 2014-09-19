@@ -1,8 +1,9 @@
 # qcode-decoder
 
-> Decodes QRCode in the browser
+> Decodes QRCode in the browser [http://cirocosta.github.io/qcode-decoder/](http://cirocosta.github.io/qcode-decoder/)
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/cirocosta_github.svg)](https://saucelabs.com/u/cirocosta_github)
+![Browser Compatibility](https://saucelabs.com/browser-matrix/cirocosta_github.svg?auth=a5761b97365c7191c7d725825877157f)
+
 
 ## Using in your project
 
@@ -20,7 +21,7 @@ attach it to your `.html` file
 
 and use it!
 
-**For a full example, see `/examples` or [this plunkr](http://plnkr.co/aWikiL)**
+*For more examples, see the [github.io](http://cirocosta.github.io/qcode-decoder/) page and examples folder.*
 
 The API is Pretty simple:
 
