@@ -31,10 +31,18 @@ h2 {
 
 h3 {
   @include text(2.5rem, .5rem, .5rem, $color__base--light, bold);
+  &:hover::after {
+    content: "#";
+    margin-left: 1rem;
+  }
 }
 
 h4 {
   @include text(2rem, .5rem, .5rem, $color__base--light, bold);
+  &:hover::after {
+    content: "#";
+    margin-left: 1rem;
+  }
 }
 
 h1 > a:hover,

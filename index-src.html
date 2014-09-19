@@ -10,9 +10,12 @@
   <meta property="og:title" content="QCodeDecoder">
   <meta property="og:description" content="Browser-ready QR Code decoder in Javascript">
 	<title>QCodeDecoder</title>
+
+  <link href="/dist/assets/favicon.ico" rel="shortcut icon" type="image/x-icon">
   <link rel="stylesheet" href="dist/css/main.css">
 </head>
 <body>
+  <div class="line__top"></div>
 
   <header>
     <h1>QRCodeDecoder</h1>
@@ -44,6 +47,8 @@
         <p>QCodeDecoder keeps everything simple, trying to do well only a few things.</p>
         <p>There are mainly three things to do with the library: decode a qr-code directly from camera (i.e, the phone's front/back camera, your webcam or whatever), from a video or from an image.</p>
 
+        <p>In the following samples the QRCodes contains a local IP Addres.</p>
+
         <section id="image" class="grid__row">
           <h4 id="samples-image"><a href="#samples-image">Image</a></h4>
           <p>The simplest case is decoding from an image. It only requires passing to the <code>decodeFromImage</code> method the image's source or an image element that has a <code>src</code> attribute set.</p>
@@ -51,7 +56,7 @@
           <aside>
             <div class="sample grid__col--2">
               <img src="dist/assets/qrcode.png" alt="qr-code image" />
-              <p><button class="btn" class="base__button">Decode!</button></p>
+              <p><button class="btn" class="base__button">Decode</button></p>
             </div>
             <div class="grid__col--6">
               <pre class="prettyprint">
@@ -75,7 +80,7 @@ QCodeDecoder()
             <div class="sample grid__col--2">
               <video id="video-demo" src="dist/assets/qrcode-video.mp4" controls preload></video>
               <p>
-                <button class="btn">Play</button>
+                <button class="btn">Decode</button>
               </p>
             </div>
             <div class="grid__col--6">
@@ -97,7 +102,8 @@ QCodeDecoder()
           <p>Decoding from camera requires, firstly, access to the user's camera. For getting this, QCodeDecoder will ask the user about it (this process is required so that browsers are able to keep it secure) and, if conceived, start searching for a valid QRCode to decode.</p>
 
           <aside class="note">
-            <p>Note that you need to have a valid QRCode and a camera to try this one. If you don't have, check the <a href="">video sample</a>.</p>
+            <p><em>Note1: You need to have a valid QRCode and a camera to try this one. If you don't have, check the <a href="sample-video">video sample</a>.</p>
+            <p><em>Note2: The camera decoder is set with 'once' parameter, decoding only one time. To decode again, click capture button to reset.</p>
           </aside>
 
           <aside>
@@ -122,12 +128,19 @@ QCodeDecoder()
         </section>
       </article>
     </section>
+
+    <section id="docs">
+      <h3><a href="#docs">Documentation</a></h3>
+
+      <p>For more documentation (there is also a <code>multiple-source selector</code>, for example), check the <code>README.md</code> file at the github repository :)</p>
+    </section>
   </main>
 
   <footer>
-    <p><a href="https://github.com/cirocosta/qcode-decoder">see on github</a></p>
+    <p>by <a href="https://github.com/cirocosta">cirocosta</a>, <a href="https://github.com/cirocosta/qcode-decoder">see on github</a></p>
   </footer>
 
+  <script src="build/qcode-decoder.min.js"></script>
   <script src="dist/js/main.js"></script>
   <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
 </body>
