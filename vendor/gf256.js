@@ -1,8 +1,8 @@
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -46,15 +46,21 @@ function GF256( primitive)
 	this.zero = new GF256Poly(this, new Array(at0));
 	var at1=new Array(1);at1[0]=1;
 	this.one = new GF256Poly(this, new Array(at1));
-	
-	this.__defineGetter__("Zero", function()
-	{
-		return this.zero;
-	});
-	this.__defineGetter__("One", function()
-	{
-		return this.one;
-	});
+
+  Object.defineProperties(this, {
+    'Zero': {
+      get: function () {
+        return this.zero;
+      }
+    },
+
+    'One': {
+      get: function () {
+        return this.one;
+      }
+    }
+  });
+
 	this.buildMonomial=function( degree,  coefficient)
 		{
 			if (degree < 0)
@@ -105,7 +111,7 @@ function GF256( primitive)
 				return a;
 			}
 			return this.expTable[(this.logTable[a] + this.logTable[b]) % 255];
-		}		
+		}
 }
 
 GF256.QR_CODE_FIELD = new GF256(0x011D);

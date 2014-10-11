@@ -97,22 +97,32 @@ function FinderPattern(posX, posY,  estimatedModuleSize)
 	this.count = 1;
 	this.estimatedModuleSize = estimatedModuleSize;
 
-	this.__defineGetter__("EstimatedModuleSize", function()
-	{
-		return this.estimatedModuleSize;
-	});
-	this.__defineGetter__("Count", function()
-	{
-		return this.count;
-	});
-	this.__defineGetter__("X", function()
-	{
-		return this.x;
-	});
-	this.__defineGetter__("Y", function()
-	{
-		return this.y;
-	});
+  Object.defineProperties(this, {
+  	"EstimatedModuleSize": {
+      get: function() {
+    		return this.estimatedModuleSize;
+      }
+  	},
+
+  	"Count": {
+      get: function() {
+    		return this.count;
+      }
+  	},
+
+  	"X": {
+      get: function() {
+    		return this.x;
+      }
+  	},
+
+  	"Y": {
+      get: function() {
+    		return this.y;
+      }
+  	}
+  });
+
 	this.incrementCount = function()
 	{
 		this.count++;
@@ -134,18 +144,24 @@ function FinderPatternInfo(patternCenters)
 	this.bottomLeft = patternCenters[0];
 	this.topLeft = patternCenters[1];
 	this.topRight = patternCenters[2];
-	this.__defineGetter__("BottomLeft", function()
-	{
-		return this.bottomLeft;
-	});
-	this.__defineGetter__("TopLeft", function()
-	{
-		return this.topLeft;
-	});
-	this.__defineGetter__("TopRight", function()
-	{
-		return this.topRight;
-	});
+
+  Object.defineProperties(this, {
+  	"BottomLeft": {
+      get: function   {
+    		return this.bottomLeft;
+      }
+  	},
+  	"TopLeft": {
+      get: function   {
+    		return this.topLeft;
+      }
+  	},
+  	"TopRight": {
+      get: function   {
+    		return this.topRight;
+      }
+  	}
+  });
 }
 
 function FinderPatternFinder()
@@ -156,15 +172,17 @@ function FinderPatternFinder()
 	this.crossCheckStateCount = new Array(0,0,0,0,0);
 	this.resultPointCallback = null;
 
-	this.__defineGetter__("CrossCheckStateCount", function()
-	{
-		this.crossCheckStateCount[0] = 0;
-		this.crossCheckStateCount[1] = 0;
-		this.crossCheckStateCount[2] = 0;
-		this.crossCheckStateCount[3] = 0;
-		this.crossCheckStateCount[4] = 0;
-		return this.crossCheckStateCount;
-	});
+  Object.defineProperty(this, 'CrossCheckStateCount', {
+    get: function  () {
+  		this.crossCheckStateCount[0] = 0;
+  		this.crossCheckStateCount[1] = 0;
+  		this.crossCheckStateCount[2] = 0;
+  		this.crossCheckStateCount[3] = 0;
+  		this.crossCheckStateCount[4] = 0;
+
+  		return this.crossCheckStateCount;
+    }
+  });
 
 	this.foundPatternCross=function( stateCount)
 		{

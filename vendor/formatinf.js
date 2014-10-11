@@ -1,8 +1,8 @@
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -33,14 +33,20 @@ function FormatInformation(formatInfo)
 	this.errorCorrectionLevel = ErrorCorrectionLevel.forBits((formatInfo >> 3) & 0x03);
 	this.dataMask =  (formatInfo & 0x07);
 
-	this.__defineGetter__("ErrorCorrectionLevel", function()
-	{
-		return this.errorCorrectionLevel;
-	});
-	this.__defineGetter__("DataMask", function()
-	{
-		return this.dataMask;
-	});
+  Object.defineProperties(this, {
+    'ErrorCorrectionLevel': {
+      get: function () {
+        return this.errorCorrectionLevel;
+      }
+    },
+
+    'DataMask': {
+      get: function () {
+        return this.dataMask;
+      }
+    }
+  });
+
 	this.GetHashCode=function()
 	{
 		return (this.errorCorrectionLevel.ordinal() << 3) |  dataMask;
@@ -101,4 +107,4 @@ FormatInformation.doDecodeFormatInformation=function( maskedFormatInfo)
 	return null;
 }
 
-		
+
