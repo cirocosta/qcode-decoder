@@ -159,10 +159,10 @@ GridSampler.sampleGridx=function( image,  dimension,  p1ToX,  p1ToY,  p2ToX,  p2
 }
 
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -188,49 +188,60 @@ function ECB(count,  dataCodewords)
 {
 	this.count = count;
 	this.dataCodewords = dataCodewords;
-	
-	this.__defineGetter__("Count", function()
-	{
-		return this.count;
-	});
-	this.__defineGetter__("DataCodewords", function()
-	{
-		return this.dataCodewords;
-	});
+
+  Object.defineProperties(this, {
+    'Count': {
+      get: function () {
+        return this.count;
+      }
+    },
+
+    'DataCodewords': {
+      get: function () {
+        return this.dataCodewords;
+      }
+    }
+  });
 }
 
 function ECBlocks( ecCodewordsPerBlock,  ecBlocks1,  ecBlocks2)
 {
 	this.ecCodewordsPerBlock = ecCodewordsPerBlock;
-	if(ecBlocks2)
+
+	if (ecBlocks2)
 		this.ecBlocks = new Array(ecBlocks1, ecBlocks2);
 	else
 		this.ecBlocks = new Array(ecBlocks1);
-	
-	this.__defineGetter__("ECCodewordsPerBlock", function()
-	{
-		return this.ecCodewordsPerBlock;
-	});
-	
-	this.__defineGetter__("TotalECCodewords", function()
-	{
-		return  this.ecCodewordsPerBlock * this.NumBlocks;
-	});
-	
-	this.__defineGetter__("NumBlocks", function()
-	{
-		var total = 0;
-		for (var i = 0; i < this.ecBlocks.length; i++)
-		{
-			total += this.ecBlocks[i].length;
-		}
-		return total;
-	});
-	
-	this.getECBlocks=function()
-			{
-				return this.ecBlocks;
-			}
+
+  Object.defineProperties(this, {
+  	"ECCodewordsPerBlock": {
+      get: function () {
+    		return this.ecCodewordsPerBlock;
+
+      }
+  	},
+
+  	"TotalECCodewords": {
+      get: function () {
+    		return  this.ecCodewordsPerBlock * this.NumBlocks;
+      }
+  	},
+
+  	"NumBlocks": {
+      get: function () {
+    		var total = 0;
+
+    		for (var i = 0; i < this.ecBlocks.length; i++)
+    			total += this.ecBlocks[i].length;
+
+    		return total;
+      }
+    }
+  });
+
+	this.getECBlocks = function() {
+		return this.ecBlocks;
+	};
 }
 
 function Version( versionNumber,  alignmentPatternCenters,  ecBlocks1,  ecBlocks2,  ecBlocks3,  ecBlocks4)
@@ -238,7 +249,7 @@ function Version( versionNumber,  alignmentPatternCenters,  ecBlocks1,  ecBlocks
 	this.versionNumber = versionNumber;
 	this.alignmentPatternCenters = alignmentPatternCenters;
 	this.ecBlocks = new Array(ecBlocks1, ecBlocks2, ecBlocks3, ecBlocks4);
-	
+
 	var total = 0;
 	var ecCodewords = ecBlocks1.ECCodewordsPerBlock;
 	var ecbArray = ecBlocks1.getECBlocks();
@@ -248,37 +259,43 @@ function Version( versionNumber,  alignmentPatternCenters,  ecBlocks1,  ecBlocks
 		total += ecBlock.Count * (ecBlock.DataCodewords + ecCodewords);
 	}
 	this.totalCodewords = total;
-	
-	this.__defineGetter__("VersionNumber", function()
-	{
-		return  this.versionNumber;
-	});
-	
-	this.__defineGetter__("AlignmentPatternCenters", function()
-	{
-		return  this.alignmentPatternCenters;
-	});
-	this.__defineGetter__("TotalCodewords", function()
-	{
-		return  this.totalCodewords;
-	});
-	this.__defineGetter__("DimensionForVersion", function()
-	{
-		return  17 + 4 * this.versionNumber;
-	});
-	
+
+  Object.defineProperties(this, {
+  	"VersionNumber": {
+  		get: function () {
+        return  this.versionNumber;
+      }
+    },
+
+  	"AlignmentPatternCenters": {
+  		get: function () {
+        return  this.alignmentPatternCenters;
+      }
+    },
+  	"TotalCodewords": {
+  		get: function () {
+        return  this.totalCodewords;
+      }
+    },
+  	"DimensionForVersion": {
+  		get: function () {
+        return  17 + 4 * this.versionNumber;
+      }
+    }
+  });
+
 	this.buildFunctionPattern=function()
 		{
 			var dimension = this.DimensionForVersion;
 			var bitMatrix = new BitMatrix(dimension);
-			
+
 			// Top left finder pattern + separator + format
 			bitMatrix.setRegion(0, 0, 9, 9);
 			// Top right finder pattern + separator + format
 			bitMatrix.setRegion(dimension - 8, 0, 8, 9);
 			// Bottom left finder pattern + separator + format
 			bitMatrix.setRegion(0, dimension - 8, 9, 8);
-			
+
 			// Alignment patterns
 			var max = this.alignmentPatternCenters.length;
 			for (var x = 0; x < max; x++)
@@ -294,12 +311,12 @@ function Version( versionNumber,  alignmentPatternCenters,  ecBlocks1,  ecBlocks
 					bitMatrix.setRegion(this.alignmentPatternCenters[y] - 2, i, 5, 5);
 				}
 			}
-			
+
 			// Vertical timing pattern
 			bitMatrix.setRegion(6, 9, 1, dimension - 17);
 			// Horizontal timing pattern
 			bitMatrix.setRegion(9, 6, dimension - 17, 1);
-			
+
 			if (this.versionNumber > 6)
 			{
 				// Version info, top right
@@ -307,7 +324,7 @@ function Version( versionNumber,  alignmentPatternCenters,  ecBlocks1,  ecBlocks
 				// Version info, bottom left
 				bitMatrix.setRegion(0, dimension - 11, 6, 3);
 			}
-			
+
 			return bitMatrix;
 		}
 	this.getECBlocksForLevel=function( ecLevel)
@@ -378,47 +395,48 @@ Version.decodeVersionInformation=function( versionBits)
 
 function buildVersions()
 {
-	return new Array(new Version(1, new Array(), new ECBlocks(7, new ECB(1, 19)), new ECBlocks(10, new ECB(1, 16)), new ECBlocks(13, new ECB(1, 13)), new ECBlocks(17, new ECB(1, 9))), 
-	new Version(2, new Array(6, 18), new ECBlocks(10, new ECB(1, 34)), new ECBlocks(16, new ECB(1, 28)), new ECBlocks(22, new ECB(1, 22)), new ECBlocks(28, new ECB(1, 16))), 
-	new Version(3, new Array(6, 22), new ECBlocks(15, new ECB(1, 55)), new ECBlocks(26, new ECB(1, 44)), new ECBlocks(18, new ECB(2, 17)), new ECBlocks(22, new ECB(2, 13))), 
-	new Version(4, new Array(6, 26), new ECBlocks(20, new ECB(1, 80)), new ECBlocks(18, new ECB(2, 32)), new ECBlocks(26, new ECB(2, 24)), new ECBlocks(16, new ECB(4, 9))), 
-	new Version(5, new Array(6, 30), new ECBlocks(26, new ECB(1, 108)), new ECBlocks(24, new ECB(2, 43)), new ECBlocks(18, new ECB(2, 15), new ECB(2, 16)), new ECBlocks(22, new ECB(2, 11), new ECB(2, 12))), 
-	new Version(6, new Array(6, 34), new ECBlocks(18, new ECB(2, 68)), new ECBlocks(16, new ECB(4, 27)), new ECBlocks(24, new ECB(4, 19)), new ECBlocks(28, new ECB(4, 15))), 
-	new Version(7, new Array(6, 22, 38), new ECBlocks(20, new ECB(2, 78)), new ECBlocks(18, new ECB(4, 31)), new ECBlocks(18, new ECB(2, 14), new ECB(4, 15)), new ECBlocks(26, new ECB(4, 13), new ECB(1, 14))), 
-	new Version(8, new Array(6, 24, 42), new ECBlocks(24, new ECB(2, 97)), new ECBlocks(22, new ECB(2, 38), new ECB(2, 39)), new ECBlocks(22, new ECB(4, 18), new ECB(2, 19)), new ECBlocks(26, new ECB(4, 14), new ECB(2, 15))), 
-	new Version(9, new Array(6, 26, 46), new ECBlocks(30, new ECB(2, 116)), new ECBlocks(22, new ECB(3, 36), new ECB(2, 37)), new ECBlocks(20, new ECB(4, 16), new ECB(4, 17)), new ECBlocks(24, new ECB(4, 12), new ECB(4, 13))), 
-	new Version(10, new Array(6, 28, 50), new ECBlocks(18, new ECB(2, 68), new ECB(2, 69)), new ECBlocks(26, new ECB(4, 43), new ECB(1, 44)), new ECBlocks(24, new ECB(6, 19), new ECB(2, 20)), new ECBlocks(28, new ECB(6, 15), new ECB(2, 16))), 
-	new Version(11, new Array(6, 30, 54), new ECBlocks(20, new ECB(4, 81)), new ECBlocks(30, new ECB(1, 50), new ECB(4, 51)), new ECBlocks(28, new ECB(4, 22), new ECB(4, 23)), new ECBlocks(24, new ECB(3, 12), new ECB(8, 13))), 
-	new Version(12, new Array(6, 32, 58), new ECBlocks(24, new ECB(2, 92), new ECB(2, 93)), new ECBlocks(22, new ECB(6, 36), new ECB(2, 37)), new ECBlocks(26, new ECB(4, 20), new ECB(6, 21)), new ECBlocks(28, new ECB(7, 14), new ECB(4, 15))), 
-	new Version(13, new Array(6, 34, 62), new ECBlocks(26, new ECB(4, 107)), new ECBlocks(22, new ECB(8, 37), new ECB(1, 38)), new ECBlocks(24, new ECB(8, 20), new ECB(4, 21)), new ECBlocks(22, new ECB(12, 11), new ECB(4, 12))), 
-	new Version(14, new Array(6, 26, 46, 66), new ECBlocks(30, new ECB(3, 115), new ECB(1, 116)), new ECBlocks(24, new ECB(4, 40), new ECB(5, 41)), new ECBlocks(20, new ECB(11, 16), new ECB(5, 17)), new ECBlocks(24, new ECB(11, 12), new ECB(5, 13))), 
-	new Version(15, new Array(6, 26, 48, 70), new ECBlocks(22, new ECB(5, 87), new ECB(1, 88)), new ECBlocks(24, new ECB(5, 41), new ECB(5, 42)), new ECBlocks(30, new ECB(5, 24), new ECB(7, 25)), new ECBlocks(24, new ECB(11, 12), new ECB(7, 13))), 
-	new Version(16, new Array(6, 26, 50, 74), new ECBlocks(24, new ECB(5, 98), new ECB(1, 99)), new ECBlocks(28, new ECB(7, 45), new ECB(3, 46)), new ECBlocks(24, new ECB(15, 19), new ECB(2, 20)), new ECBlocks(30, new ECB(3, 15), new ECB(13, 16))), 
-	new Version(17, new Array(6, 30, 54, 78), new ECBlocks(28, new ECB(1, 107), new ECB(5, 108)), new ECBlocks(28, new ECB(10, 46), new ECB(1, 47)), new ECBlocks(28, new ECB(1, 22), new ECB(15, 23)), new ECBlocks(28, new ECB(2, 14), new ECB(17, 15))), 
-	new Version(18, new Array(6, 30, 56, 82), new ECBlocks(30, new ECB(5, 120), new ECB(1, 121)), new ECBlocks(26, new ECB(9, 43), new ECB(4, 44)), new ECBlocks(28, new ECB(17, 22), new ECB(1, 23)), new ECBlocks(28, new ECB(2, 14), new ECB(19, 15))), 
-	new Version(19, new Array(6, 30, 58, 86), new ECBlocks(28, new ECB(3, 113), new ECB(4, 114)), new ECBlocks(26, new ECB(3, 44), new ECB(11, 45)), new ECBlocks(26, new ECB(17, 21), new ECB(4, 22)), new ECBlocks(26, new ECB(9, 13), new ECB(16, 14))), 
-	new Version(20, new Array(6, 34, 62, 90), new ECBlocks(28, new ECB(3, 107), new ECB(5, 108)), new ECBlocks(26, new ECB(3, 41), new ECB(13, 42)), new ECBlocks(30, new ECB(15, 24), new ECB(5, 25)), new ECBlocks(28, new ECB(15, 15), new ECB(10, 16))), 
-	new Version(21, new Array(6, 28, 50, 72, 94), new ECBlocks(28, new ECB(4, 116), new ECB(4, 117)), new ECBlocks(26, new ECB(17, 42)), new ECBlocks(28, new ECB(17, 22), new ECB(6, 23)), new ECBlocks(30, new ECB(19, 16), new ECB(6, 17))), 
-	new Version(22, new Array(6, 26, 50, 74, 98), new ECBlocks(28, new ECB(2, 111), new ECB(7, 112)), new ECBlocks(28, new ECB(17, 46)), new ECBlocks(30, new ECB(7, 24), new ECB(16, 25)), new ECBlocks(24, new ECB(34, 13))), 
-	new Version(23, new Array(6, 30, 54, 74, 102), new ECBlocks(30, new ECB(4, 121), new ECB(5, 122)), new ECBlocks(28, new ECB(4, 47), new ECB(14, 48)), new ECBlocks(30, new ECB(11, 24), new ECB(14, 25)), new ECBlocks(30, new ECB(16, 15), new ECB(14, 16))), 
-	new Version(24, new Array(6, 28, 54, 80, 106), new ECBlocks(30, new ECB(6, 117), new ECB(4, 118)), new ECBlocks(28, new ECB(6, 45), new ECB(14, 46)), new ECBlocks(30, new ECB(11, 24), new ECB(16, 25)), new ECBlocks(30, new ECB(30, 16), new ECB(2, 17))), 
-	new Version(25, new Array(6, 32, 58, 84, 110), new ECBlocks(26, new ECB(8, 106), new ECB(4, 107)), new ECBlocks(28, new ECB(8, 47), new ECB(13, 48)), new ECBlocks(30, new ECB(7, 24), new ECB(22, 25)), new ECBlocks(30, new ECB(22, 15), new ECB(13, 16))), 
-	new Version(26, new Array(6, 30, 58, 86, 114), new ECBlocks(28, new ECB(10, 114), new ECB(2, 115)), new ECBlocks(28, new ECB(19, 46), new ECB(4, 47)), new ECBlocks(28, new ECB(28, 22), new ECB(6, 23)), new ECBlocks(30, new ECB(33, 16), new ECB(4, 17))), 
+	return new Array(new Version(1, new Array(), new ECBlocks(7, new ECB(1, 19)), new ECBlocks(10, new ECB(1, 16)), new ECBlocks(13, new ECB(1, 13)), new ECBlocks(17, new ECB(1, 9))),
+	new Version(2, new Array(6, 18), new ECBlocks(10, new ECB(1, 34)), new ECBlocks(16, new ECB(1, 28)), new ECBlocks(22, new ECB(1, 22)), new ECBlocks(28, new ECB(1, 16))),
+	new Version(3, new Array(6, 22), new ECBlocks(15, new ECB(1, 55)), new ECBlocks(26, new ECB(1, 44)), new ECBlocks(18, new ECB(2, 17)), new ECBlocks(22, new ECB(2, 13))),
+	new Version(4, new Array(6, 26), new ECBlocks(20, new ECB(1, 80)), new ECBlocks(18, new ECB(2, 32)), new ECBlocks(26, new ECB(2, 24)), new ECBlocks(16, new ECB(4, 9))),
+	new Version(5, new Array(6, 30), new ECBlocks(26, new ECB(1, 108)), new ECBlocks(24, new ECB(2, 43)), new ECBlocks(18, new ECB(2, 15), new ECB(2, 16)), new ECBlocks(22, new ECB(2, 11), new ECB(2, 12))),
+	new Version(6, new Array(6, 34), new ECBlocks(18, new ECB(2, 68)), new ECBlocks(16, new ECB(4, 27)), new ECBlocks(24, new ECB(4, 19)), new ECBlocks(28, new ECB(4, 15))),
+	new Version(7, new Array(6, 22, 38), new ECBlocks(20, new ECB(2, 78)), new ECBlocks(18, new ECB(4, 31)), new ECBlocks(18, new ECB(2, 14), new ECB(4, 15)), new ECBlocks(26, new ECB(4, 13), new ECB(1, 14))),
+	new Version(8, new Array(6, 24, 42), new ECBlocks(24, new ECB(2, 97)), new ECBlocks(22, new ECB(2, 38), new ECB(2, 39)), new ECBlocks(22, new ECB(4, 18), new ECB(2, 19)), new ECBlocks(26, new ECB(4, 14), new ECB(2, 15))),
+	new Version(9, new Array(6, 26, 46), new ECBlocks(30, new ECB(2, 116)), new ECBlocks(22, new ECB(3, 36), new ECB(2, 37)), new ECBlocks(20, new ECB(4, 16), new ECB(4, 17)), new ECBlocks(24, new ECB(4, 12), new ECB(4, 13))),
+	new Version(10, new Array(6, 28, 50), new ECBlocks(18, new ECB(2, 68), new ECB(2, 69)), new ECBlocks(26, new ECB(4, 43), new ECB(1, 44)), new ECBlocks(24, new ECB(6, 19), new ECB(2, 20)), new ECBlocks(28, new ECB(6, 15), new ECB(2, 16))),
+	new Version(11, new Array(6, 30, 54), new ECBlocks(20, new ECB(4, 81)), new ECBlocks(30, new ECB(1, 50), new ECB(4, 51)), new ECBlocks(28, new ECB(4, 22), new ECB(4, 23)), new ECBlocks(24, new ECB(3, 12), new ECB(8, 13))),
+	new Version(12, new Array(6, 32, 58), new ECBlocks(24, new ECB(2, 92), new ECB(2, 93)), new ECBlocks(22, new ECB(6, 36), new ECB(2, 37)), new ECBlocks(26, new ECB(4, 20), new ECB(6, 21)), new ECBlocks(28, new ECB(7, 14), new ECB(4, 15))),
+	new Version(13, new Array(6, 34, 62), new ECBlocks(26, new ECB(4, 107)), new ECBlocks(22, new ECB(8, 37), new ECB(1, 38)), new ECBlocks(24, new ECB(8, 20), new ECB(4, 21)), new ECBlocks(22, new ECB(12, 11), new ECB(4, 12))),
+	new Version(14, new Array(6, 26, 46, 66), new ECBlocks(30, new ECB(3, 115), new ECB(1, 116)), new ECBlocks(24, new ECB(4, 40), new ECB(5, 41)), new ECBlocks(20, new ECB(11, 16), new ECB(5, 17)), new ECBlocks(24, new ECB(11, 12), new ECB(5, 13))),
+	new Version(15, new Array(6, 26, 48, 70), new ECBlocks(22, new ECB(5, 87), new ECB(1, 88)), new ECBlocks(24, new ECB(5, 41), new ECB(5, 42)), new ECBlocks(30, new ECB(5, 24), new ECB(7, 25)), new ECBlocks(24, new ECB(11, 12), new ECB(7, 13))),
+	new Version(16, new Array(6, 26, 50, 74), new ECBlocks(24, new ECB(5, 98), new ECB(1, 99)), new ECBlocks(28, new ECB(7, 45), new ECB(3, 46)), new ECBlocks(24, new ECB(15, 19), new ECB(2, 20)), new ECBlocks(30, new ECB(3, 15), new ECB(13, 16))),
+	new Version(17, new Array(6, 30, 54, 78), new ECBlocks(28, new ECB(1, 107), new ECB(5, 108)), new ECBlocks(28, new ECB(10, 46), new ECB(1, 47)), new ECBlocks(28, new ECB(1, 22), new ECB(15, 23)), new ECBlocks(28, new ECB(2, 14), new ECB(17, 15))),
+	new Version(18, new Array(6, 30, 56, 82), new ECBlocks(30, new ECB(5, 120), new ECB(1, 121)), new ECBlocks(26, new ECB(9, 43), new ECB(4, 44)), new ECBlocks(28, new ECB(17, 22), new ECB(1, 23)), new ECBlocks(28, new ECB(2, 14), new ECB(19, 15))),
+	new Version(19, new Array(6, 30, 58, 86), new ECBlocks(28, new ECB(3, 113), new ECB(4, 114)), new ECBlocks(26, new ECB(3, 44), new ECB(11, 45)), new ECBlocks(26, new ECB(17, 21), new ECB(4, 22)), new ECBlocks(26, new ECB(9, 13), new ECB(16, 14))),
+	new Version(20, new Array(6, 34, 62, 90), new ECBlocks(28, new ECB(3, 107), new ECB(5, 108)), new ECBlocks(26, new ECB(3, 41), new ECB(13, 42)), new ECBlocks(30, new ECB(15, 24), new ECB(5, 25)), new ECBlocks(28, new ECB(15, 15), new ECB(10, 16))),
+	new Version(21, new Array(6, 28, 50, 72, 94), new ECBlocks(28, new ECB(4, 116), new ECB(4, 117)), new ECBlocks(26, new ECB(17, 42)), new ECBlocks(28, new ECB(17, 22), new ECB(6, 23)), new ECBlocks(30, new ECB(19, 16), new ECB(6, 17))),
+	new Version(22, new Array(6, 26, 50, 74, 98), new ECBlocks(28, new ECB(2, 111), new ECB(7, 112)), new ECBlocks(28, new ECB(17, 46)), new ECBlocks(30, new ECB(7, 24), new ECB(16, 25)), new ECBlocks(24, new ECB(34, 13))),
+	new Version(23, new Array(6, 30, 54, 74, 102), new ECBlocks(30, new ECB(4, 121), new ECB(5, 122)), new ECBlocks(28, new ECB(4, 47), new ECB(14, 48)), new ECBlocks(30, new ECB(11, 24), new ECB(14, 25)), new ECBlocks(30, new ECB(16, 15), new ECB(14, 16))),
+	new Version(24, new Array(6, 28, 54, 80, 106), new ECBlocks(30, new ECB(6, 117), new ECB(4, 118)), new ECBlocks(28, new ECB(6, 45), new ECB(14, 46)), new ECBlocks(30, new ECB(11, 24), new ECB(16, 25)), new ECBlocks(30, new ECB(30, 16), new ECB(2, 17))),
+	new Version(25, new Array(6, 32, 58, 84, 110), new ECBlocks(26, new ECB(8, 106), new ECB(4, 107)), new ECBlocks(28, new ECB(8, 47), new ECB(13, 48)), new ECBlocks(30, new ECB(7, 24), new ECB(22, 25)), new ECBlocks(30, new ECB(22, 15), new ECB(13, 16))),
+	new Version(26, new Array(6, 30, 58, 86, 114), new ECBlocks(28, new ECB(10, 114), new ECB(2, 115)), new ECBlocks(28, new ECB(19, 46), new ECB(4, 47)), new ECBlocks(28, new ECB(28, 22), new ECB(6, 23)), new ECBlocks(30, new ECB(33, 16), new ECB(4, 17))),
 	new Version(27, new Array(6, 34, 62, 90, 118), new ECBlocks(30, new ECB(8, 122), new ECB(4, 123)), new ECBlocks(28, new ECB(22, 45), new ECB(3, 46)), new ECBlocks(30, new ECB(8, 23), new ECB(26, 24)), new ECBlocks(30, new ECB(12, 15), 		new ECB(28, 16))),
-	new Version(28, new Array(6, 26, 50, 74, 98, 122), new ECBlocks(30, new ECB(3, 117), new ECB(10, 118)), new ECBlocks(28, new ECB(3, 45), new ECB(23, 46)), new ECBlocks(30, new ECB(4, 24), new ECB(31, 25)), new ECBlocks(30, new ECB(11, 15), new ECB(31, 16))), 
-	new Version(29, new Array(6, 30, 54, 78, 102, 126), new ECBlocks(30, new ECB(7, 116), new ECB(7, 117)), new ECBlocks(28, new ECB(21, 45), new ECB(7, 46)), new ECBlocks(30, new ECB(1, 23), new ECB(37, 24)), new ECBlocks(30, new ECB(19, 15), new ECB(26, 16))), 
-	new Version(30, new Array(6, 26, 52, 78, 104, 130), new ECBlocks(30, new ECB(5, 115), new ECB(10, 116)), new ECBlocks(28, new ECB(19, 47), new ECB(10, 48)), new ECBlocks(30, new ECB(15, 24), new ECB(25, 25)), new ECBlocks(30, new ECB(23, 15), new ECB(25, 16))), 
-	new Version(31, new Array(6, 30, 56, 82, 108, 134), new ECBlocks(30, new ECB(13, 115), new ECB(3, 116)), new ECBlocks(28, new ECB(2, 46), new ECB(29, 47)), new ECBlocks(30, new ECB(42, 24), new ECB(1, 25)), new ECBlocks(30, new ECB(23, 15), new ECB(28, 16))), 
-	new Version(32, new Array(6, 34, 60, 86, 112, 138), new ECBlocks(30, new ECB(17, 115)), new ECBlocks(28, new ECB(10, 46), new ECB(23, 47)), new ECBlocks(30, new ECB(10, 24), new ECB(35, 25)), new ECBlocks(30, new ECB(19, 15), new ECB(35, 16))), 
-	new Version(33, new Array(6, 30, 58, 86, 114, 142), new ECBlocks(30, new ECB(17, 115), new ECB(1, 116)), new ECBlocks(28, new ECB(14, 46), new ECB(21, 47)), new ECBlocks(30, new ECB(29, 24), new ECB(19, 25)), new ECBlocks(30, new ECB(11, 15), new ECB(46, 16))), 
-	new Version(34, new Array(6, 34, 62, 90, 118, 146), new ECBlocks(30, new ECB(13, 115), new ECB(6, 116)), new ECBlocks(28, new ECB(14, 46), new ECB(23, 47)), new ECBlocks(30, new ECB(44, 24), new ECB(7, 25)), new ECBlocks(30, new ECB(59, 16), new ECB(1, 17))), 
-	new Version(35, new Array(6, 30, 54, 78, 102, 126, 150), new ECBlocks(30, new ECB(12, 121), new ECB(7, 122)), new ECBlocks(28, new ECB(12, 47), new ECB(26, 48)), new ECBlocks(30, new ECB(39, 24), new ECB(14, 25)),new ECBlocks(30, new ECB(22, 15), new ECB(41, 16))), 
-	new Version(36, new Array(6, 24, 50, 76, 102, 128, 154), new ECBlocks(30, new ECB(6, 121), new ECB(14, 122)), new ECBlocks(28, new ECB(6, 47), new ECB(34, 48)), new ECBlocks(30, new ECB(46, 24), new ECB(10, 25)), new ECBlocks(30, new ECB(2, 15), new ECB(64, 16))), 
-	new Version(37, new Array(6, 28, 54, 80, 106, 132, 158), new ECBlocks(30, new ECB(17, 122), new ECB(4, 123)), new ECBlocks(28, new ECB(29, 46), new ECB(14, 47)), new ECBlocks(30, new ECB(49, 24), new ECB(10, 25)), new ECBlocks(30, new ECB(24, 15), new ECB(46, 16))), 
-	new Version(38, new Array(6, 32, 58, 84, 110, 136, 162), new ECBlocks(30, new ECB(4, 122), new ECB(18, 123)), new ECBlocks(28, new ECB(13, 46), new ECB(32, 47)), new ECBlocks(30, new ECB(48, 24), new ECB(14, 25)), new ECBlocks(30, new ECB(42, 15), new ECB(32, 16))), 
-	new Version(39, new Array(6, 26, 54, 82, 110, 138, 166), new ECBlocks(30, new ECB(20, 117), new ECB(4, 118)), new ECBlocks(28, new ECB(40, 47), new ECB(7, 48)), new ECBlocks(30, new ECB(43, 24), new ECB(22, 25)), new ECBlocks(30, new ECB(10, 15), new ECB(67, 16))), 
+	new Version(28, new Array(6, 26, 50, 74, 98, 122), new ECBlocks(30, new ECB(3, 117), new ECB(10, 118)), new ECBlocks(28, new ECB(3, 45), new ECB(23, 46)), new ECBlocks(30, new ECB(4, 24), new ECB(31, 25)), new ECBlocks(30, new ECB(11, 15), new ECB(31, 16))),
+	new Version(29, new Array(6, 30, 54, 78, 102, 126), new ECBlocks(30, new ECB(7, 116), new ECB(7, 117)), new ECBlocks(28, new ECB(21, 45), new ECB(7, 46)), new ECBlocks(30, new ECB(1, 23), new ECB(37, 24)), new ECBlocks(30, new ECB(19, 15), new ECB(26, 16))),
+	new Version(30, new Array(6, 26, 52, 78, 104, 130), new ECBlocks(30, new ECB(5, 115), new ECB(10, 116)), new ECBlocks(28, new ECB(19, 47), new ECB(10, 48)), new ECBlocks(30, new ECB(15, 24), new ECB(25, 25)), new ECBlocks(30, new ECB(23, 15), new ECB(25, 16))),
+	new Version(31, new Array(6, 30, 56, 82, 108, 134), new ECBlocks(30, new ECB(13, 115), new ECB(3, 116)), new ECBlocks(28, new ECB(2, 46), new ECB(29, 47)), new ECBlocks(30, new ECB(42, 24), new ECB(1, 25)), new ECBlocks(30, new ECB(23, 15), new ECB(28, 16))),
+	new Version(32, new Array(6, 34, 60, 86, 112, 138), new ECBlocks(30, new ECB(17, 115)), new ECBlocks(28, new ECB(10, 46), new ECB(23, 47)), new ECBlocks(30, new ECB(10, 24), new ECB(35, 25)), new ECBlocks(30, new ECB(19, 15), new ECB(35, 16))),
+	new Version(33, new Array(6, 30, 58, 86, 114, 142), new ECBlocks(30, new ECB(17, 115), new ECB(1, 116)), new ECBlocks(28, new ECB(14, 46), new ECB(21, 47)), new ECBlocks(30, new ECB(29, 24), new ECB(19, 25)), new ECBlocks(30, new ECB(11, 15), new ECB(46, 16))),
+	new Version(34, new Array(6, 34, 62, 90, 118, 146), new ECBlocks(30, new ECB(13, 115), new ECB(6, 116)), new ECBlocks(28, new ECB(14, 46), new ECB(23, 47)), new ECBlocks(30, new ECB(44, 24), new ECB(7, 25)), new ECBlocks(30, new ECB(59, 16), new ECB(1, 17))),
+	new Version(35, new Array(6, 30, 54, 78, 102, 126, 150), new ECBlocks(30, new ECB(12, 121), new ECB(7, 122)), new ECBlocks(28, new ECB(12, 47), new ECB(26, 48)), new ECBlocks(30, new ECB(39, 24), new ECB(14, 25)),new ECBlocks(30, new ECB(22, 15), new ECB(41, 16))),
+	new Version(36, new Array(6, 24, 50, 76, 102, 128, 154), new ECBlocks(30, new ECB(6, 121), new ECB(14, 122)), new ECBlocks(28, new ECB(6, 47), new ECB(34, 48)), new ECBlocks(30, new ECB(46, 24), new ECB(10, 25)), new ECBlocks(30, new ECB(2, 15), new ECB(64, 16))),
+	new Version(37, new Array(6, 28, 54, 80, 106, 132, 158), new ECBlocks(30, new ECB(17, 122), new ECB(4, 123)), new ECBlocks(28, new ECB(29, 46), new ECB(14, 47)), new ECBlocks(30, new ECB(49, 24), new ECB(10, 25)), new ECBlocks(30, new ECB(24, 15), new ECB(46, 16))),
+	new Version(38, new Array(6, 32, 58, 84, 110, 136, 162), new ECBlocks(30, new ECB(4, 122), new ECB(18, 123)), new ECBlocks(28, new ECB(13, 46), new ECB(32, 47)), new ECBlocks(30, new ECB(48, 24), new ECB(14, 25)), new ECBlocks(30, new ECB(42, 15), new ECB(32, 16))),
+	new Version(39, new Array(6, 26, 54, 82, 110, 138, 166), new ECBlocks(30, new ECB(20, 117), new ECB(4, 118)), new ECBlocks(28, new ECB(40, 47), new ECB(7, 48)), new ECBlocks(30, new ECB(43, 24), new ECB(22, 25)), new ECBlocks(30, new ECB(10, 15), new ECB(67, 16))),
 	new Version(40, new Array(6, 30, 58, 86, 114, 142, 170), new ECBlocks(30, new ECB(19, 118), new ECB(6, 119)), new ECBlocks(28, new ECB(18, 47), new ECB(31, 48)), new ECBlocks(30, new ECB(34, 24), new ECB(34, 25)), new ECBlocks(30, new ECB(20, 15), new ECB(61, 16))));
 }
+
 /*
   Ported to JavaScript by Lazar Laszlo 2011 
   
@@ -833,10 +851,10 @@ function Detector(image)
 	}
 }
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -867,14 +885,20 @@ function FormatInformation(formatInfo)
 	this.errorCorrectionLevel = ErrorCorrectionLevel.forBits((formatInfo >> 3) & 0x03);
 	this.dataMask =  (formatInfo & 0x07);
 
-	this.__defineGetter__("ErrorCorrectionLevel", function()
-	{
-		return this.errorCorrectionLevel;
-	});
-	this.__defineGetter__("DataMask", function()
-	{
-		return this.dataMask;
-	});
+  Object.defineProperties(this, {
+    'ErrorCorrectionLevel': {
+      get: function () {
+        return this.errorCorrectionLevel;
+      }
+    },
+
+    'DataMask': {
+      get: function () {
+        return this.dataMask;
+      }
+    }
+  });
+
 	this.GetHashCode=function()
 	{
 		return (this.errorCorrectionLevel.ordinal() << 3) |  dataMask;
@@ -935,12 +959,13 @@ FormatInformation.doDecodeFormatInformation=function( maskedFormatInfo)
 	return null;
 }
 
-		
+
+
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -966,26 +991,32 @@ function ErrorCorrectionLevel(ordinal,  bits, name)
 	this.ordinal_Renamed_Field = ordinal;
 	this.bits = bits;
 	this.name = name;
-	this.__defineGetter__("Bits", function()
-	{
-		return this.bits;
-	});
-	this.__defineGetter__("Name", function()
-	{
-		return this.name;
-	});
-	this.ordinal=function()
-	{
+
+  Object.defineProperties(this, {
+    'Bits': {
+      get: function () {
+        return this.bits;
+      }
+    },
+
+    'Name': {
+      get: function () {
+        return this.name;
+      }
+    }
+  });
+
+	this.ordinal=function() {
 		return this.ordinal_Renamed_Field;
 	}
 }
 
 ErrorCorrectionLevel.forBits=function( bits)
 {
-	if (bits < 0 || bits >= FOR_BITS.length)
-	{
+	if (bits < 0 || bits >= FOR_BITS.length) {
 		throw "ArgumentException";
 	}
+
 	return FOR_BITS[bits];
 }
 
@@ -996,10 +1027,10 @@ var H = new ErrorCorrectionLevel(3, 0x02, "H");
 var FOR_BITS = new Array( M, L, H, Q);
 
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -1031,32 +1062,40 @@ function BitMatrix( width,  height)
 	this.width = width;
 	this.height = height;
 	var rowSize = width >> 5;
-	if ((width & 0x1f) != 0)
-	{
+	if ((width & 0x1f) != 0) {
 		rowSize++;
 	}
+
 	this.rowSize = rowSize;
 	this.bits = new Array(rowSize * height);
+
 	for(var i=0;i<this.bits.length;i++)
 		this.bits[i]=0;
-	
-	this.__defineGetter__("Width", function()
-	{
-		return this.width;
-	});
-	this.__defineGetter__("Height", function()
-	{
-		return this.height;
-	});
-	this.__defineGetter__("Dimension", function()
-	{
-		if (this.width != this.height)
-		{
-			throw "Can't call getDimension() on a non-square matrix";
-		}
-		return this.width;
-	});
-	
+
+  Object.defineProperties(this, {
+    'Width': {
+      get: function () {
+        return this.width;
+      }
+    },
+
+    'Height': {
+      get: function () {
+        return this.height;
+      }
+    },
+
+    'Dimension': {
+      get: function () {
+        if (this.width != this.height) {
+          throw "Can't call getDimension() on a non-square matrix";
+        }
+
+        return this.width;
+      }
+    }
+  });
+
 	this.get_Renamed=function( x,  y)
 		{
 			var offset = y * this.rowSize + (x >> 5);
@@ -1106,11 +1145,12 @@ function BitMatrix( width,  height)
 			}
 		}
 }
+
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -1135,29 +1175,34 @@ function DataBlock(numDataCodewords,  codewords)
 {
 	this.numDataCodewords = numDataCodewords;
 	this.codewords = codewords;
-	
-	this.__defineGetter__("NumDataCodewords", function()
-	{
-		return this.numDataCodewords;
-	});
-	this.__defineGetter__("Codewords", function()
-	{
-		return this.codewords;
-	});
-}	
-	
+
+  Object.defineProperties(this, {
+    'NumDataCodewords': {
+      get: function () {
+        return this.numDataCodewords;
+      }
+    },
+
+    'Codewords': {
+      get: function () {
+        return this.codewords;
+      }
+    }
+  });
+}
+
 DataBlock.getDataBlocks=function(rawCodewords,  version,  ecLevel)
 {
-	
+
 	if (rawCodewords.length != version.TotalCodewords)
 	{
 		throw "ArgumentException";
 	}
-	
+
 	// Figure out the number and size of data blocks used by this version and
 	// error correction level
 	var ecBlocks = version.getECBlocksForLevel(ecLevel);
-	
+
 	// First count the total number of data blocks
 	var totalBlocks = 0;
 	var ecBlockArray = ecBlocks.getECBlocks();
@@ -1165,7 +1210,7 @@ DataBlock.getDataBlocks=function(rawCodewords,  version,  ecLevel)
 	{
 		totalBlocks += ecBlockArray[i].Count;
 	}
-	
+
 	// Now establish DataBlocks of the appropriate size and number of data codewords
 	var result = new Array(totalBlocks);
 	var numResultBlocks = 0;
@@ -1179,7 +1224,7 @@ DataBlock.getDataBlocks=function(rawCodewords,  version,  ecLevel)
 			result[numResultBlocks++] = new DataBlock(numDataCodewords, new Array(numBlockCodewords));
 		}
 	}
-	
+
 	// All blocks have the same amount of data, except that the last n
 	// (where n may be 0) have 1 more byte. Figure out where these start.
 	var shorterBlocksTotalCodewords = result[0].codewords.length;
@@ -1194,7 +1239,7 @@ DataBlock.getDataBlocks=function(rawCodewords,  version,  ecLevel)
 		longerBlocksStartAt--;
 	}
 	longerBlocksStartAt++;
-	
+
 	var shorterBlocksNumDataCodewords = shorterBlocksTotalCodewords - ecBlocks.ECCodewordsPerBlock;
 	// The last elements of result may be 1 element longer;
 	// first fill out as many elements as all of them have
@@ -1814,10 +1859,10 @@ function ReedSolomonDecoder(field)
 		}
 }
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -1870,25 +1915,32 @@ function GF256Poly(field,  coefficients)
 	{
 		this.coefficients = coefficients;
 	}
-	
-	this.__defineGetter__("Zero", function()
-	{
-		return this.coefficients[0] == 0;
-	});
-	this.__defineGetter__("Degree", function()
-	{
-		return this.coefficients.length - 1;
-	});
-	this.__defineGetter__("Coefficients", function()
-	{
-		return this.coefficients;
-	});
-	
+
+  Object.defineProperties(this, {
+  	"Zero": {
+      get: function () {
+    		return this.coefficients[0] == 0;
+      }
+  	},
+
+  	"Degree": {
+      get: function () {
+    		return this.coefficients.length - 1;
+      }
+  	},
+
+  	"Coefficients": {
+      get: function () {
+    		return this.coefficients;
+      }
+  	}
+  });
+
 	this.getCoefficient=function( degree)
 	{
 		return this.coefficients[this.coefficients.length - 1 - degree];
 	}
-	
+
 	this.evaluateAt=function( a)
 	{
 		if (a == 0)
@@ -1914,7 +1966,7 @@ function GF256Poly(field,  coefficients)
 		}
 		return result2;
 	}
-	
+
 	this.addOrSubtract=function( other)
 		{
 			if (this.field != other.field)
@@ -1929,7 +1981,7 @@ function GF256Poly(field,  coefficients)
 			{
 				return this;
 			}
-			
+
 			var smallerCoefficients = this.coefficients;
 			var largerCoefficients = other.coefficients;
 			if (smallerCoefficients.length > largerCoefficients.length)
@@ -1943,12 +1995,12 @@ function GF256Poly(field,  coefficients)
 			// Copy high-order terms only found in higher-degree polynomial's coefficients
 			//Array.Copy(largerCoefficients, 0, sumDiff, 0, lengthDiff);
 			for(var ci=0;ci<lengthDiff;ci++)sumDiff[ci]=largerCoefficients[ci];
-			
+
 			for (var i = lengthDiff; i < largerCoefficients.length; i++)
 			{
 				sumDiff[i] = GF256.addOrSubtract(smallerCoefficients[i - lengthDiff], largerCoefficients[i]);
 			}
-			
+
 			return new GF256Poly(field, sumDiff);
 	}
 	this.multiply1=function( other)
@@ -2023,13 +2075,13 @@ function GF256Poly(field,  coefficients)
 			{
 				throw "Divide by 0";
 			}
-			
+
 			var quotient = this.field.Zero;
 			var remainder = this;
-			
+
 			var denominatorLeadingTerm = other.getCoefficient(other.Degree);
 			var inverseDenominatorLeadingTerm = this.field.inverse(denominatorLeadingTerm);
-			
+
 			while (remainder.Degree >= other.Degree && !remainder.Zero)
 			{
 				var degreeDifference = remainder.Degree - other.Degree;
@@ -2039,15 +2091,16 @@ function GF256Poly(field,  coefficients)
 				quotient = quotient.addOrSubtract(iterationQuotient);
 				remainder = remainder.addOrSubtract(term);
 			}
-			
+
 			return new Array(quotient, remainder);
 		}
 }
+
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -2091,15 +2144,21 @@ function GF256( primitive)
 	this.zero = new GF256Poly(this, new Array(at0));
 	var at1=new Array(1);at1[0]=1;
 	this.one = new GF256Poly(this, new Array(at1));
-	
-	this.__defineGetter__("Zero", function()
-	{
-		return this.zero;
-	});
-	this.__defineGetter__("One", function()
-	{
-		return this.one;
-	});
+
+  Object.defineProperties(this, {
+    'Zero': {
+      get: function () {
+        return this.zero;
+      }
+    },
+
+    'One': {
+      get: function () {
+        return this.one;
+      }
+    }
+  });
+
 	this.buildMonomial=function( degree,  coefficient)
 		{
 			if (degree < 0)
@@ -2150,7 +2209,7 @@ function GF256( primitive)
 				return a;
 			}
 			return this.expTable[(this.logTable[a] + this.logTable[b]) % 255];
-		}		
+		}
 }
 
 GF256.QR_CODE_FIELD = new GF256(0x011D);
@@ -2160,6 +2219,7 @@ GF256.addOrSubtract=function( a,  b)
 {
 	return a ^ b;
 }
+
 /*
   Ported to JavaScript by Lazar Laszlo 2011 
   
@@ -2612,124 +2672,126 @@ var MAX_MODULES = 57;
 var INTEGER_MATH_SHIFT = 8;
 var CENTER_QUORUM = 2;
 
-qrcode.orderBestPatterns=function(patterns)
-		{
+qrcode.orderBestPatterns = function (patterns) {
+	function distance( pattern1,  pattern2) {
+		xDiff = pattern1.X - pattern2.X;
+		yDiff = pattern1.Y - pattern2.Y;
+		return  Math.sqrt( (xDiff * xDiff + yDiff * yDiff));
+	}
 
-			function distance( pattern1,  pattern2)
-			{
-				xDiff = pattern1.X - pattern2.X;
-				yDiff = pattern1.Y - pattern2.Y;
-				return  Math.sqrt( (xDiff * xDiff + yDiff * yDiff));
-			}
+	/// <summary> Returns the z component of the cross product between vectors BC and BA.</summary>
+	function crossProductZ( pointA,  pointB,  pointC) {
+		var bX = pointB.x;
+		var bY = pointB.y;
+		return ((pointC.x - bX) * (pointA.y - bY)) - ((pointC.y - bY) * (pointA.x - bX));
+	}
 
-			/// <summary> Returns the z component of the cross product between vectors BC and BA.</summary>
-			function crossProductZ( pointA,  pointB,  pointC)
-			{
-				var bX = pointB.x;
-				var bY = pointB.y;
-				return ((pointC.x - bX) * (pointA.y - bY)) - ((pointC.y - bY) * (pointA.x - bX));
-			}
+	// Find distances between pattern centers
+	var zeroOneDistance = distance(patterns[0], patterns[1]);
+	var oneTwoDistance = distance(patterns[1], patterns[2]);
+	var zeroTwoDistance = distance(patterns[0], patterns[2]);
 
+	var pointA, pointB, pointC;
+	// Assume one closest to other two is B; A and C will just be guesses at first
+	if (oneTwoDistance >= zeroOneDistance && oneTwoDistance >= zeroTwoDistance) {
+		pointB = patterns[0];
+		pointA = patterns[1];
+		pointC = patterns[2];
+	} else if (zeroTwoDistance >= oneTwoDistance && zeroTwoDistance >= zeroOneDistance) {
+		pointB = patterns[1];
+		pointA = patterns[0];
+		pointC = patterns[2];
+	} else {
+		pointB = patterns[2];
+		pointA = patterns[0];
+		pointC = patterns[1];
+	}
 
-			// Find distances between pattern centers
-			var zeroOneDistance = distance(patterns[0], patterns[1]);
-			var oneTwoDistance = distance(patterns[1], patterns[2]);
-			var zeroTwoDistance = distance(patterns[0], patterns[2]);
+	// Use cross product to figure out whether A and C are correct or flipped.
+	// This asks whether BC x BA has a positive z component, which is the arrangement
+	// we want for A, B, C. If it's negative, then we've got it flipped around and
+	// should swap A and C.
+	if (crossProductZ(pointA, pointB, pointC) < 0.0) {
+		var temp = pointA;
 
-			var pointA, pointB, pointC;
-			// Assume one closest to other two is B; A and C will just be guesses at first
-			if (oneTwoDistance >= zeroOneDistance && oneTwoDistance >= zeroTwoDistance)
-			{
-				pointB = patterns[0];
-				pointA = patterns[1];
-				pointC = patterns[2];
-			}
-			else if (zeroTwoDistance >= oneTwoDistance && zeroTwoDistance >= zeroOneDistance)
-			{
-				pointB = patterns[1];
-				pointA = patterns[0];
-				pointC = patterns[2];
-			}
-			else
-			{
-				pointB = patterns[2];
-				pointA = patterns[0];
-				pointC = patterns[1];
-			}
+		pointA = pointC;
+		pointC = temp;
+	}
 
-			// Use cross product to figure out whether A and C are correct or flipped.
-			// This asks whether BC x BA has a positive z component, which is the arrangement
-			// we want for A, B, C. If it's negative, then we've got it flipped around and
-			// should swap A and C.
-			if (crossProductZ(pointA, pointB, pointC) < 0.0)
-			{
-				var temp = pointA;
-				pointA = pointC;
-				pointC = temp;
-			}
+	patterns[0] = pointA;
+	patterns[1] = pointB;
+	patterns[2] = pointC;
+};
 
-			patterns[0] = pointA;
-			patterns[1] = pointB;
-			patterns[2] = pointC;
-		}
-
-
-function FinderPattern(posX, posY,  estimatedModuleSize)
-{
+function FinderPattern (posX, posY,  estimatedModuleSize) {
 	this.x=posX;
 	this.y=posY;
 	this.count = 1;
 	this.estimatedModuleSize = estimatedModuleSize;
 
-	this.__defineGetter__("EstimatedModuleSize", function()
-	{
-		return this.estimatedModuleSize;
-	});
-	this.__defineGetter__("Count", function()
-	{
-		return this.count;
-	});
-	this.__defineGetter__("X", function()
-	{
-		return this.x;
-	});
-	this.__defineGetter__("Y", function()
-	{
-		return this.y;
-	});
-	this.incrementCount = function()
-	{
+  Object.defineProperties(this, {
+  	"EstimatedModuleSize": {
+      get: function () {
+    		return this.estimatedModuleSize;
+      }
+  	},
+
+  	"Count": {
+      get: function () {
+    		return this.count;
+      }
+  	},
+
+  	"X": {
+      get: function () {
+    		return this.x;
+      }
+  	},
+
+  	"Y": {
+      get: function () {
+    		return this.y;
+      }
+  	}
+  });
+
+	this.incrementCount = function() {
 		this.count++;
-	}
-	this.aboutEquals=function( moduleSize,  i,  j)
-		{
-			if (Math.abs(i - this.y) <= moduleSize && Math.abs(j - this.x) <= moduleSize)
-			{
-				var moduleSizeDiff = Math.abs(moduleSize - this.estimatedModuleSize);
-				return moduleSizeDiff <= 1.0 || moduleSizeDiff / this.estimatedModuleSize <= 1.0;
-			}
-			return false;
+	};
+
+	this.aboutEquals = function (moduleSize,  i, j) {
+		if (Math.abs(i - this.y) <= moduleSize && Math.abs(j - this.x) <= moduleSize) {
+			var moduleSizeDiff = Math.abs(moduleSize - this.estimatedModuleSize);
+
+			return moduleSizeDiff <= 1.0 || moduleSizeDiff / this.estimatedModuleSize <= 1.0;
 		}
 
-}
+		return false;
+	}
+};
 
-function FinderPatternInfo(patternCenters)
-{
+function FinderPatternInfo(patternCenters) {
 	this.bottomLeft = patternCenters[0];
 	this.topLeft = patternCenters[1];
 	this.topRight = patternCenters[2];
-	this.__defineGetter__("BottomLeft", function()
-	{
-		return this.bottomLeft;
-	});
-	this.__defineGetter__("TopLeft", function()
-	{
-		return this.topLeft;
-	});
-	this.__defineGetter__("TopRight", function()
-	{
-		return this.topRight;
-	});
+
+  Object.defineProperties(this, {
+  	"BottomLeft": {
+      get: function () {
+    		return this.bottomLeft;
+      }
+  	},
+  	"TopLeft": {
+      get: function () {
+    		return this.topLeft;
+      }
+  	},
+  	"TopRight": {
+      get: function () {
+    		return this.topRight;
+      }
+  	}
+  });
 }
 
 function FinderPatternFinder()
@@ -2740,15 +2802,17 @@ function FinderPatternFinder()
 	this.crossCheckStateCount = new Array(0,0,0,0,0);
 	this.resultPointCallback = null;
 
-	this.__defineGetter__("CrossCheckStateCount", function()
-	{
-		this.crossCheckStateCount[0] = 0;
-		this.crossCheckStateCount[1] = 0;
-		this.crossCheckStateCount[2] = 0;
-		this.crossCheckStateCount[3] = 0;
-		this.crossCheckStateCount[4] = 0;
-		return this.crossCheckStateCount;
-	});
+  Object.defineProperty(this, 'CrossCheckStateCount', {
+    get: function  () {
+  		this.crossCheckStateCount[0] = 0;
+  		this.crossCheckStateCount[1] = 0;
+  		this.crossCheckStateCount[2] = 0;
+  		this.crossCheckStateCount[3] = 0;
+  		this.crossCheckStateCount[4] = 0;
+
+  		return this.crossCheckStateCount;
+    }
+  });
 
 	this.foundPatternCross=function( stateCount)
 		{
@@ -3233,10 +3297,10 @@ function FinderPatternFinder()
 }
 
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -3263,23 +3327,33 @@ function AlignmentPattern(posX, posY,  estimatedModuleSize)
 	this.y=posY;
 	this.count = 1;
 	this.estimatedModuleSize = estimatedModuleSize;
-	
-	this.__defineGetter__("EstimatedModuleSize", function()
-	{
-		return this.estimatedModuleSize;
-	}); 
-	this.__defineGetter__("Count", function()
-	{
-		return this.count;
-	});
-	this.__defineGetter__("X", function()
-	{
-		return Math.floor(this.x);
-	});
-	this.__defineGetter__("Y", function()
-	{
-		return Math.floor(this.y);
-	});
+
+  Object.defineProperties(this, {
+    'EstimatedModuleSize': {
+      get: function () {
+        return this.estimatedModuleSize;
+      }
+    },
+
+  	"Count": {
+      get: function() {
+    		return this.count;
+      }
+  	},
+
+  	"X": {
+      get: function() {
+    		return Math.floor(this.x);
+      }
+  	},
+
+  	"Y": {
+      get: function() {
+    		return Math.floor(this.y);
+      }
+  	}
+  });
+
 	this.incrementCount = function()
 	{
 		this.count++;
@@ -3293,7 +3367,7 @@ function AlignmentPattern(posX, posY,  estimatedModuleSize)
 			}
 			return false;
 		}
-	
+
 }
 
 function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  moduleSize,  resultPointCallback)
@@ -3307,7 +3381,7 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 	this.moduleSize = moduleSize;
 	this.crossCheckStateCount = new Array(0,0,0);
 	this.resultPointCallback = resultPointCallback;
-	
+
 	this.centerFromEnd=function(stateCount,  end)
 		{
 			return  (end - stateCount[2]) - stateCount[1] / 2.0;
@@ -3329,13 +3403,13 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 	this.crossCheckVertical=function( startI,  centerJ,  maxCount,  originalStateCountTotal)
 		{
 			var image = this.image;
-			
+
 			var maxI = qrcode.height;
 			var stateCount = this.crossCheckStateCount;
 			stateCount[0] = 0;
 			stateCount[1] = 0;
 			stateCount[2] = 0;
-			
+
 			// Start counting up from center
 			var i = startI;
 			while (i >= 0 && image[centerJ + i*qrcode.width] && stateCount[1] <= maxCount)
@@ -3357,7 +3431,7 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 			{
 				return NaN;
 			}
-			
+
 			// Now also count down from center
 			i = startI + 1;
 			while (i < maxI && image[centerJ + i*qrcode.width] && stateCount[1] <= maxCount)
@@ -3378,16 +3452,16 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 			{
 				return NaN;
 			}
-			
+
 			var stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2];
 			if (5 * Math.abs(stateCountTotal - originalStateCountTotal) >= 2 * originalStateCountTotal)
 			{
 				return NaN;
 			}
-			
+
 			return this.foundPatternCross(stateCount)?this.centerFromEnd(stateCount, i):NaN;
 		}
-		
+
 	this.handlePossibleCenter=function( stateCount,  i,  j)
 		{
 			var stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2];
@@ -3416,7 +3490,7 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 			}
 			return null;
 		}
-		
+
 	this.find = function()
 	{
 			var startX = this.startX;
@@ -3499,23 +3573,24 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 					}
 				}
 			}
-			
+
 			// Hmm, nothing we saw was observed and confirmed twice. If we had
 			// any guess at all, return it.
 			if (!(this.possibleCenters.length == 0))
 			{
 				return  this.possibleCenters[0];
 			}
-			
+
 			throw "Couldn't find enough alignment patterns";
 		}
-	
+
 }
+
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -3536,8 +3611,7 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 */
 
 
-function QRCodeDataBlockReader(blocks,  version,  numErrorCorrectionCode)
-{
+function QRCodeDataBlockReader (blocks,  version,  numErrorCorrectionCode) {
 	this.blockPointer = 0;
 	this.bitPointer = 7;
 	this.dataLength = 0;
@@ -3549,292 +3623,252 @@ function QRCodeDataBlockReader(blocks,  version,  numErrorCorrectionCode)
 		this.dataLengthMode = 1;
 	else if (version >= 27 && version <= 40)
 		this.dataLengthMode = 2;
-		
-	this.getNextBits = function( numBits)
-		{			
-			var bits = 0;
-			if (numBits < this.bitPointer + 1)
-			{
-				// next word fits into current data block
-				var mask = 0;
-				for (var i = 0; i < numBits; i++)
-				{
-					mask += (1 << i);
-				}
-				mask <<= (this.bitPointer - numBits + 1);
-				
-				bits = (this.blocks[this.blockPointer] & mask) >> (this.bitPointer - numBits + 1);
-				this.bitPointer -= numBits;
-				return bits;
+
+	this.getNextBits = function (numBits) {
+		var bits = 0;
+
+		if (numBits < this.bitPointer + 1) {
+			// next word fits into current data block
+			var mask = 0;
+			for (var i = 0; i < numBits; i++) {
+				mask += (1 << i);
 			}
-			else if (numBits < this.bitPointer + 1 + 8)
+			mask <<= (this.bitPointer - numBits + 1);
+
+			bits = (this.blocks[this.blockPointer] & mask) >> (this.bitPointer - numBits + 1);
+			this.bitPointer -= numBits;
+			return bits;
+		} else if (numBits < this.bitPointer + 1 + 8) {
+			// next word crosses 2 data blocks
+			var mask1 = 0;
+			for (var i = 0; i < this.bitPointer + 1; i++)
 			{
-				// next word crosses 2 data blocks
-				var mask1 = 0;
-				for (var i = 0; i < this.bitPointer + 1; i++)
-				{
-					mask1 += (1 << i);
-				}
-				bits = (this.blocks[this.blockPointer] & mask1) << (numBits - (this.bitPointer + 1));
-                this.blockPointer++;
-				bits += ((this.blocks[this.blockPointer]) >> (8 - (numBits - (this.bitPointer + 1))));
-				
-				this.bitPointer = this.bitPointer - numBits % 8;
-				if (this.bitPointer < 0)
-				{
-					this.bitPointer = 8 + this.bitPointer;
-				}
-				return bits;
+				mask1 += (1 << i);
 			}
-			else if (numBits < this.bitPointer + 1 + 16)
+			bits = (this.blocks[this.blockPointer] & mask1) << (numBits - (this.bitPointer + 1));
+              this.blockPointer++;
+			bits += ((this.blocks[this.blockPointer]) >> (8 - (numBits - (this.bitPointer + 1))));
+
+			this.bitPointer = this.bitPointer - numBits % 8;
+			if (this.bitPointer < 0)
 			{
-				// next word crosses 3 data blocks
-				var mask1 = 0; // mask of first block
-				var mask3 = 0; // mask of 3rd block
-				//bitPointer + 1 : number of bits of the 1st block
-				//8 : number of the 2nd block (note that use already 8bits because next word uses 3 data blocks)
-				//numBits - (bitPointer + 1 + 8) : number of bits of the 3rd block 
-				for (var i = 0; i < this.bitPointer + 1; i++)
-				{
-					mask1 += (1 << i);
-				}
-				var bitsFirstBlock = (this.blocks[this.blockPointer] & mask1) << (numBits - (this.bitPointer + 1));
-				this.blockPointer++;
-				
-				var bitsSecondBlock = this.blocks[this.blockPointer] << (numBits - (this.bitPointer + 1 + 8));
-				this.blockPointer++;
-				
-				for (var i = 0; i < numBits - (this.bitPointer + 1 + 8); i++)
-				{
-					mask3 += (1 << i);
-				}
-				mask3 <<= 8 - (numBits - (this.bitPointer + 1 + 8));
-				var bitsThirdBlock = (this.blocks[this.blockPointer] & mask3) >> (8 - (numBits - (this.bitPointer + 1 + 8)));
-				
-				bits = bitsFirstBlock + bitsSecondBlock + bitsThirdBlock;
-				this.bitPointer = this.bitPointer - (numBits - 8) % 8;
-				if (this.bitPointer < 0)
-				{
-					this.bitPointer = 8 + this.bitPointer;
-				}
-				return bits;
+				this.bitPointer = 8 + this.bitPointer;
 			}
-			else
+			return bits;
+		} else if (numBits < this.bitPointer + 1 + 16) {
+			// next word crosses 3 data blocks
+			var mask1 = 0; // mask of first block
+			var mask3 = 0; // mask of 3rd block
+			//bitPointer + 1 : number of bits of the 1st block
+			//8 : number of the 2nd block (note that use already 8bits because next word uses 3 data blocks)
+			//numBits - (bitPointer + 1 + 8) : number of bits of the 3rd block
+			for (var i = 0; i < this.bitPointer + 1; i++)
 			{
-				return 0;
+				mask1 += (1 << i);
 			}
+			var bitsFirstBlock = (this.blocks[this.blockPointer] & mask1) << (numBits - (this.bitPointer + 1));
+			this.blockPointer++;
+
+			var bitsSecondBlock = this.blocks[this.blockPointer] << (numBits - (this.bitPointer + 1 + 8));
+			this.blockPointer++;
+
+			for (var i = 0; i < numBits - (this.bitPointer + 1 + 8); i++) {
+				mask3 += (1 << i);
+			}
+
+      mask3 <<= 8 - (numBits - (this.bitPointer + 1 + 8));
+			var bitsThirdBlock = (this.blocks[this.blockPointer] & mask3) >> (8 - (numBits - (this.bitPointer + 1 + 8)));
+
+			bits = bitsFirstBlock + bitsSecondBlock + bitsThirdBlock;
+			this.bitPointer = this.bitPointer - (numBits - 8) % 8;
+			if (this.bitPointer < 0) {
+				this.bitPointer = 8 + this.bitPointer;
+			}
+
+			return bits;
+		} else {
+			return 0;
 		}
-	this.NextMode=function()
-	{
+	};
+
+	this.NextMode = function () {
 		if ((this.blockPointer > this.blocks.length - this.numErrorCorrectionCode - 2))
 			return 0;
 		else
 			return this.getNextBits(4);
-	}
-	this.getDataLength=function( modeIndicator)
+	};
+
+	this.getDataLength=function( modeIndicator) {
+		var index = 0;
+		while (true)
 		{
-			var index = 0;
-			while (true)
-			{
-				if ((modeIndicator >> index) == 1)
-					break;
-				index++;
-			}
-			
-			return this.getNextBits(qrcode.sizeOfDataLengthInfo[this.dataLengthMode][index]);
+			if ((modeIndicator >> index) == 1)
+				break;
+			index++;
 		}
-	this.getRomanAndFigureString=function( dataLength)
-		{
+
+		return this.getNextBits(qrcode.sizeOfDataLengthInfo[this.dataLengthMode][index]);
+	};
+
+	this.getRomanAndFigureString = function (dataLength) {
 			var length = dataLength;
 			var intData = 0;
 			var strData = "";
 			var tableRomanAndFigure = new Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '$', '%', '*', '+', '-', '.', '/', ':');
-			do 
-			{
-				if (length > 1)
-				{
+
+			do {
+				if (length > 1) {
 					intData = this.getNextBits(11);
 					var firstLetter = Math.floor(intData / 45);
 					var secondLetter = intData % 45;
 					strData += tableRomanAndFigure[firstLetter];
 					strData += tableRomanAndFigure[secondLetter];
 					length -= 2;
-				}
-				else if (length == 1)
-				{
+				} else if (length == 1) {
 					intData = this.getNextBits(6);
 					strData += tableRomanAndFigure[intData];
 					length -= 1;
 				}
-			}
-			while (length > 0);
-			
-			return strData;
-		}
-	this.getFigureString=function( dataLength)
-		{
-			var length = dataLength;
-			var intData = 0;
-			var strData = "";
-			do 
-			{
-				if (length >= 3)
-				{
-					intData = this.getNextBits(10);
-					if (intData < 100)
-						strData += "0";
-					if (intData < 10)
-						strData += "0";
-					length -= 3;
-				}
-				else if (length == 2)
-				{
-					intData = this.getNextBits(7);
-					if (intData < 10)
-						strData += "0";
-					length -= 2;
-				}
-				else if (length == 1)
-				{
-					intData = this.getNextBits(4);
-					length -= 1;
-				}
-				strData += intData;
-			}
-			while (length > 0);
-			
-			return strData;
-		}
-	this.get8bitByteArray=function( dataLength)
-		{
-			var length = dataLength;
-			var intData = 0;
-			var output = new Array();
-			
-			do 
-			{
-				intData = this.getNextBits(8);
-				output.push( intData);
-				length--;
-			}
-			while (length > 0);
-			return output;
-		}
-    this.getKanjiString=function( dataLength)
-		{
-			var length = dataLength;
-			var intData = 0;
-			var unicodeString = "";
-			do 
-			{
-				intData = getNextBits(13);
-				var lowerByte = intData % 0xC0;
-				var higherByte = intData / 0xC0;
-				
-				var tempWord = (higherByte << 8) + lowerByte;
-				var shiftjisWord = 0;
-				if (tempWord + 0x8140 <= 0x9FFC)
-				{
-					// between 8140 - 9FFC on Shift_JIS character set
-					shiftjisWord = tempWord + 0x8140;
-				}
-				else
-				{
-					// between E040 - EBBF on Shift_JIS character set
-					shiftjisWord = tempWord + 0xC140;
-				}
-				
-				//var tempByte = new Array(0,0);
-				//tempByte[0] = (sbyte) (shiftjisWord >> 8);
-				//tempByte[1] = (sbyte) (shiftjisWord & 0xFF);
-				//unicodeString += new String(SystemUtils.ToCharArray(SystemUtils.ToByteArray(tempByte)));
-                unicodeString += String.fromCharCode(shiftjisWord);
-				length--;
-			}
-			while (length > 0);
-			
-			
-			return unicodeString;
-		}
+			} while (length > 0);
 
-	this.__defineGetter__("DataByte", function()
-	{
+			return strData;
+	};
+
+	this.getFigureString=function( dataLength) {
+		var length = dataLength;
+		var intData = 0;
+		var strData = "";
+		do
+		{
+			if (length >= 3)
+			{
+				intData = this.getNextBits(10);
+				if (intData < 100)
+					strData += "0";
+				if (intData < 10)
+					strData += "0";
+				length -= 3;
+			}
+			else if (length == 2)
+			{
+				intData = this.getNextBits(7);
+				if (intData < 10)
+					strData += "0";
+				length -= 2;
+			}
+			else if (length == 1)
+			{
+				intData = this.getNextBits(4);
+				length -= 1;
+			}
+			strData += intData;
+		}
+		while (length > 0);
+
+		return strData;
+	};
+
+	this.get8bitByteArray=function( dataLength) {
+		var length = dataLength;
+		var intData = 0;
 		var output = new Array();
-		var MODE_NUMBER = 1;
-	    var MODE_ROMAN_AND_NUMBER = 2;
-	    var MODE_8BIT_BYTE = 4;
-	    var MODE_KANJI = 8;
-		do 
-					{
-						var mode = this.NextMode();
-						//canvas.println("mode: " + mode);
-						if (mode == 0)
-						{
-							if (output.length > 0)
-								break;
-							else
-								throw "Empty data block";
-						}
-						//if (mode != 1 && mode != 2 && mode != 4 && mode != 8)
-						//	break;
-						//}
-						if (mode != MODE_NUMBER && mode != MODE_ROMAN_AND_NUMBER && mode != MODE_8BIT_BYTE && mode != MODE_KANJI)
-						{
-							/*					canvas.println("Invalid mode: " + mode);
-							mode = guessMode(mode);
-							canvas.println("Guessed mode: " + mode); */
-							throw "Invalid mode: " + mode + " in (block:" + this.blockPointer + " bit:" + this.bitPointer + ")";
-						}
-						dataLength = this.getDataLength(mode);
-						if (dataLength < 1)
-							throw "Invalid data length: " + dataLength;
-						//canvas.println("length: " + dataLength);
-						switch (mode)
-						{
-							
-							case MODE_NUMBER: 
-								//canvas.println("Mode: Figure");
-								var temp_str = this.getFigureString(dataLength);
-								var ta = new Array(temp_str.length);
-								for(var j=0;j<temp_str.length;j++)
-									ta[j]=temp_str.charCodeAt(j);
-								output.push(ta);
-								break;
-							
-							case MODE_ROMAN_AND_NUMBER: 
-								//canvas.println("Mode: Roman&Figure");
-								var temp_str = this.getRomanAndFigureString(dataLength);
-								var ta = new Array(temp_str.length);
-								for(var j=0;j<temp_str.length;j++)
-									ta[j]=temp_str.charCodeAt(j);
-								output.push(ta );
-								//output.Write(SystemUtils.ToByteArray(temp_sbyteArray2), 0, temp_sbyteArray2.Length);
-								break;
-							
-							case MODE_8BIT_BYTE: 
-								//canvas.println("Mode: 8bit Byte");
-								//sbyte[] temp_sbyteArray3;
-								var temp_sbyteArray3 = this.get8bitByteArray(dataLength);
-								output.push(temp_sbyteArray3);
-								//output.Write(SystemUtils.ToByteArray(temp_sbyteArray3), 0, temp_sbyteArray3.Length);
-								break;
-							
-							case MODE_KANJI: 
-								//canvas.println("Mode: Kanji");
-								//sbyte[] temp_sbyteArray4;
-								//temp_sbyteArray4 = SystemUtils.ToSByteArray(SystemUtils.ToByteArray(getKanjiString(dataLength)));
-								//output.Write(SystemUtils.ToByteArray(temp_sbyteArray4), 0, temp_sbyteArray4.Length);
-                                var temp_str = this.getKanjiString(dataLength);
-								output.push(temp_str);
-								break;
-							}
-						//			
-						//canvas.println("DataLength: " + dataLength);
-						//Console.out.println(dataString);
-					}
-					while (true);
+
+		do {
+			intData = this.getNextBits(8);
+			output.push( intData);
+			length--;
+		} while (length > 0);
+
 		return output;
-	});
+	};
+
+  this.getKanjiString = function (dataLength) {
+		var length = dataLength;
+		var intData = 0;
+		var unicodeString = "";
+		do {
+			intData = getNextBits(13);
+			var lowerByte = intData % 0xC0;
+			var higherByte = intData / 0xC0;
+
+			var tempWord = (higherByte << 8) + lowerByte;
+			var shiftjisWord = 0;
+			if (tempWord + 0x8140 <= 0x9FFC) {
+				// between 8140 - 9FFC on Shift_JIS character set
+				shiftjisWord = tempWord + 0x8140;
+			} else {
+				// between E040 - EBBF on Shift_JIS character set
+				shiftjisWord = tempWord + 0xC140;
+			}
+
+      unicodeString += String.fromCharCode(shiftjisWord);
+			length--;
+		} while (length > 0);
+
+		return unicodeString;
+	};
+
+  Object.defineProperty(this, 'DataByte', {
+    get: function () {
+      var output = new Array();
+      var MODE_NUMBER = 1;
+      var MODE_ROMAN_AND_NUMBER = 2;
+      var MODE_8BIT_BYTE = 4;
+      var MODE_KANJI = 8;
+      do {
+        var mode = this.NextMode();
+        if (mode == 0) {
+          if (output.length > 0)
+            break;
+          else
+            throw "Empty data block";
+        }
+
+        if (mode != MODE_NUMBER &&
+            mode != MODE_ROMAN_AND_NUMBER &&
+            mode != MODE_8BIT_BYTE &&
+            mode != MODE_KANJI) {
+
+          mode = guessMode(mode);
+          throw "Invalid mode: " + mode + " in (block:" + this.blockPointer + " bit:" + this.bitPointer + ")";
+        }
+
+        dataLength = this.getDataLength(mode);
+
+        if (dataLength < 1)
+          throw "Invalid data length: " + dataLength;
+        switch (mode) {
+          case MODE_NUMBER:
+            var temp_str = this.getFigureString(dataLength);
+            var ta = new Array(temp_str.length);
+            for(var j=0;j<temp_str.length;j++)
+              ta[j]=temp_str.charCodeAt(j);
+            output.push(ta);
+            break;
+
+          case MODE_ROMAN_AND_NUMBER:
+            var temp_str = this.getRomanAndFigureString(dataLength);
+            var ta = new Array(temp_str.length);
+            for(var j=0;j<temp_str.length;j++)
+              ta[j]=temp_str.charCodeAt(j);
+            output.push(ta );
+            break;
+
+          case MODE_8BIT_BYTE:
+            var temp_sbyteArray3 = this.get8bitByteArray(dataLength);
+            output.push(temp_sbyteArray3);
+            break;
+
+          case MODE_KANJI:
+            var temp_str = this.getKanjiString(dataLength);
+            output.push(temp_str);
+            break;
+          }
+      } while (true);
+    return output;
+
+    }
+  });
 }
 return qrcode;}));
 

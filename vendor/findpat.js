@@ -28,124 +28,126 @@ var MAX_MODULES = 57;
 var INTEGER_MATH_SHIFT = 8;
 var CENTER_QUORUM = 2;
 
-qrcode.orderBestPatterns=function(patterns)
-		{
+qrcode.orderBestPatterns = function (patterns) {
+	function distance( pattern1,  pattern2) {
+		xDiff = pattern1.X - pattern2.X;
+		yDiff = pattern1.Y - pattern2.Y;
+		return  Math.sqrt( (xDiff * xDiff + yDiff * yDiff));
+	}
 
-			function distance( pattern1,  pattern2)
-			{
-				xDiff = pattern1.X - pattern2.X;
-				yDiff = pattern1.Y - pattern2.Y;
-				return  Math.sqrt( (xDiff * xDiff + yDiff * yDiff));
-			}
+	/// <summary> Returns the z component of the cross product between vectors BC and BA.</summary>
+	function crossProductZ( pointA,  pointB,  pointC) {
+		var bX = pointB.x;
+		var bY = pointB.y;
+		return ((pointC.x - bX) * (pointA.y - bY)) - ((pointC.y - bY) * (pointA.x - bX));
+	}
 
-			/// <summary> Returns the z component of the cross product between vectors BC and BA.</summary>
-			function crossProductZ( pointA,  pointB,  pointC)
-			{
-				var bX = pointB.x;
-				var bY = pointB.y;
-				return ((pointC.x - bX) * (pointA.y - bY)) - ((pointC.y - bY) * (pointA.x - bX));
-			}
+	// Find distances between pattern centers
+	var zeroOneDistance = distance(patterns[0], patterns[1]);
+	var oneTwoDistance = distance(patterns[1], patterns[2]);
+	var zeroTwoDistance = distance(patterns[0], patterns[2]);
 
+	var pointA, pointB, pointC;
+	// Assume one closest to other two is B; A and C will just be guesses at first
+	if (oneTwoDistance >= zeroOneDistance && oneTwoDistance >= zeroTwoDistance) {
+		pointB = patterns[0];
+		pointA = patterns[1];
+		pointC = patterns[2];
+	} else if (zeroTwoDistance >= oneTwoDistance && zeroTwoDistance >= zeroOneDistance) {
+		pointB = patterns[1];
+		pointA = patterns[0];
+		pointC = patterns[2];
+	} else {
+		pointB = patterns[2];
+		pointA = patterns[0];
+		pointC = patterns[1];
+	}
 
-			// Find distances between pattern centers
-			var zeroOneDistance = distance(patterns[0], patterns[1]);
-			var oneTwoDistance = distance(patterns[1], patterns[2]);
-			var zeroTwoDistance = distance(patterns[0], patterns[2]);
+	// Use cross product to figure out whether A and C are correct or flipped.
+	// This asks whether BC x BA has a positive z component, which is the arrangement
+	// we want for A, B, C. If it's negative, then we've got it flipped around and
+	// should swap A and C.
+	if (crossProductZ(pointA, pointB, pointC) < 0.0) {
+		var temp = pointA;
 
-			var pointA, pointB, pointC;
-			// Assume one closest to other two is B; A and C will just be guesses at first
-			if (oneTwoDistance >= zeroOneDistance && oneTwoDistance >= zeroTwoDistance)
-			{
-				pointB = patterns[0];
-				pointA = patterns[1];
-				pointC = patterns[2];
-			}
-			else if (zeroTwoDistance >= oneTwoDistance && zeroTwoDistance >= zeroOneDistance)
-			{
-				pointB = patterns[1];
-				pointA = patterns[0];
-				pointC = patterns[2];
-			}
-			else
-			{
-				pointB = patterns[2];
-				pointA = patterns[0];
-				pointC = patterns[1];
-			}
+		pointA = pointC;
+		pointC = temp;
+	}
 
-			// Use cross product to figure out whether A and C are correct or flipped.
-			// This asks whether BC x BA has a positive z component, which is the arrangement
-			// we want for A, B, C. If it's negative, then we've got it flipped around and
-			// should swap A and C.
-			if (crossProductZ(pointA, pointB, pointC) < 0.0)
-			{
-				var temp = pointA;
-				pointA = pointC;
-				pointC = temp;
-			}
+	patterns[0] = pointA;
+	patterns[1] = pointB;
+	patterns[2] = pointC;
+};
 
-			patterns[0] = pointA;
-			patterns[1] = pointB;
-			patterns[2] = pointC;
-		}
-
-
-function FinderPattern(posX, posY,  estimatedModuleSize)
-{
+function FinderPattern (posX, posY,  estimatedModuleSize) {
 	this.x=posX;
 	this.y=posY;
 	this.count = 1;
 	this.estimatedModuleSize = estimatedModuleSize;
 
-	this.__defineGetter__("EstimatedModuleSize", function()
-	{
-		return this.estimatedModuleSize;
-	});
-	this.__defineGetter__("Count", function()
-	{
-		return this.count;
-	});
-	this.__defineGetter__("X", function()
-	{
-		return this.x;
-	});
-	this.__defineGetter__("Y", function()
-	{
-		return this.y;
-	});
-	this.incrementCount = function()
-	{
+  Object.defineProperties(this, {
+  	"EstimatedModuleSize": {
+      get: function () {
+    		return this.estimatedModuleSize;
+      }
+  	},
+
+  	"Count": {
+      get: function () {
+    		return this.count;
+      }
+  	},
+
+  	"X": {
+      get: function () {
+    		return this.x;
+      }
+  	},
+
+  	"Y": {
+      get: function () {
+    		return this.y;
+      }
+  	}
+  });
+
+	this.incrementCount = function() {
 		this.count++;
-	}
-	this.aboutEquals=function( moduleSize,  i,  j)
-		{
-			if (Math.abs(i - this.y) <= moduleSize && Math.abs(j - this.x) <= moduleSize)
-			{
-				var moduleSizeDiff = Math.abs(moduleSize - this.estimatedModuleSize);
-				return moduleSizeDiff <= 1.0 || moduleSizeDiff / this.estimatedModuleSize <= 1.0;
-			}
-			return false;
+	};
+
+	this.aboutEquals = function (moduleSize,  i, j) {
+		if (Math.abs(i - this.y) <= moduleSize && Math.abs(j - this.x) <= moduleSize) {
+			var moduleSizeDiff = Math.abs(moduleSize - this.estimatedModuleSize);
+
+			return moduleSizeDiff <= 1.0 || moduleSizeDiff / this.estimatedModuleSize <= 1.0;
 		}
 
-}
+		return false;
+	}
+};
 
-function FinderPatternInfo(patternCenters)
-{
+function FinderPatternInfo(patternCenters) {
 	this.bottomLeft = patternCenters[0];
 	this.topLeft = patternCenters[1];
 	this.topRight = patternCenters[2];
-	this.__defineGetter__("BottomLeft", function()
-	{
-		return this.bottomLeft;
-	});
-	this.__defineGetter__("TopLeft", function()
-	{
-		return this.topLeft;
-	});
-	this.__defineGetter__("TopRight", function()
-	{
-		return this.topRight;
-	});
+
+  Object.defineProperties(this, {
+  	"BottomLeft": {
+      get: function () {
+    		return this.bottomLeft;
+      }
+  	},
+  	"TopLeft": {
+      get: function () {
+    		return this.topLeft;
+      }
+  	},
+  	"TopRight": {
+      get: function () {
+    		return this.topRight;
+      }
+  	}
+  });
 }
 
 function FinderPatternFinder()
@@ -156,15 +158,17 @@ function FinderPatternFinder()
 	this.crossCheckStateCount = new Array(0,0,0,0,0);
 	this.resultPointCallback = null;
 
-	this.__defineGetter__("CrossCheckStateCount", function()
-	{
-		this.crossCheckStateCount[0] = 0;
-		this.crossCheckStateCount[1] = 0;
-		this.crossCheckStateCount[2] = 0;
-		this.crossCheckStateCount[3] = 0;
-		this.crossCheckStateCount[4] = 0;
-		return this.crossCheckStateCount;
-	});
+  Object.defineProperty(this, 'CrossCheckStateCount', {
+    get: function  () {
+  		this.crossCheckStateCount[0] = 0;
+  		this.crossCheckStateCount[1] = 0;
+  		this.crossCheckStateCount[2] = 0;
+  		this.crossCheckStateCount[3] = 0;
+  		this.crossCheckStateCount[4] = 0;
+
+  		return this.crossCheckStateCount;
+    }
+  });
 
 	this.foundPatternCross=function( stateCount)
 		{

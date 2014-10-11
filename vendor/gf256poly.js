@@ -1,8 +1,8 @@
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -55,25 +55,32 @@ function GF256Poly(field,  coefficients)
 	{
 		this.coefficients = coefficients;
 	}
-	
-	this.__defineGetter__("Zero", function()
-	{
-		return this.coefficients[0] == 0;
-	});
-	this.__defineGetter__("Degree", function()
-	{
-		return this.coefficients.length - 1;
-	});
-	this.__defineGetter__("Coefficients", function()
-	{
-		return this.coefficients;
-	});
-	
+
+  Object.defineProperties(this, {
+  	"Zero": {
+      get: function () {
+    		return this.coefficients[0] == 0;
+      }
+  	},
+
+  	"Degree": {
+      get: function () {
+    		return this.coefficients.length - 1;
+      }
+  	},
+
+  	"Coefficients": {
+      get: function () {
+    		return this.coefficients;
+      }
+  	}
+  });
+
 	this.getCoefficient=function( degree)
 	{
 		return this.coefficients[this.coefficients.length - 1 - degree];
 	}
-	
+
 	this.evaluateAt=function( a)
 	{
 		if (a == 0)
@@ -99,7 +106,7 @@ function GF256Poly(field,  coefficients)
 		}
 		return result2;
 	}
-	
+
 	this.addOrSubtract=function( other)
 		{
 			if (this.field != other.field)
@@ -114,7 +121,7 @@ function GF256Poly(field,  coefficients)
 			{
 				return this;
 			}
-			
+
 			var smallerCoefficients = this.coefficients;
 			var largerCoefficients = other.coefficients;
 			if (smallerCoefficients.length > largerCoefficients.length)
@@ -128,12 +135,12 @@ function GF256Poly(field,  coefficients)
 			// Copy high-order terms only found in higher-degree polynomial's coefficients
 			//Array.Copy(largerCoefficients, 0, sumDiff, 0, lengthDiff);
 			for(var ci=0;ci<lengthDiff;ci++)sumDiff[ci]=largerCoefficients[ci];
-			
+
 			for (var i = lengthDiff; i < largerCoefficients.length; i++)
 			{
 				sumDiff[i] = GF256.addOrSubtract(smallerCoefficients[i - lengthDiff], largerCoefficients[i]);
 			}
-			
+
 			return new GF256Poly(field, sumDiff);
 	}
 	this.multiply1=function( other)
@@ -208,13 +215,13 @@ function GF256Poly(field,  coefficients)
 			{
 				throw "Divide by 0";
 			}
-			
+
 			var quotient = this.field.Zero;
 			var remainder = this;
-			
+
 			var denominatorLeadingTerm = other.getCoefficient(other.Degree);
 			var inverseDenominatorLeadingTerm = this.field.inverse(denominatorLeadingTerm);
-			
+
 			while (remainder.Degree >= other.Degree && !remainder.Zero)
 			{
 				var degreeDifference = remainder.Degree - other.Degree;
@@ -224,7 +231,7 @@ function GF256Poly(field,  coefficients)
 				quotient = quotient.addOrSubtract(iterationQuotient);
 				remainder = remainder.addOrSubtract(term);
 			}
-			
+
 			return new Array(quotient, remainder);
 		}
 }

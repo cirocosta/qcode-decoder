@@ -1,8 +1,8 @@
 /*
-  Ported to JavaScript by Lazar Laszlo 2011 
-  
+  Ported to JavaScript by Lazar Laszlo 2011
+
   lazarsoft@gmail.com, www.lazarsoft.info
-  
+
 */
 
 /*
@@ -29,23 +29,33 @@ function AlignmentPattern(posX, posY,  estimatedModuleSize)
 	this.y=posY;
 	this.count = 1;
 	this.estimatedModuleSize = estimatedModuleSize;
-	
-	this.__defineGetter__("EstimatedModuleSize", function()
-	{
-		return this.estimatedModuleSize;
-	}); 
-	this.__defineGetter__("Count", function()
-	{
-		return this.count;
-	});
-	this.__defineGetter__("X", function()
-	{
-		return Math.floor(this.x);
-	});
-	this.__defineGetter__("Y", function()
-	{
-		return Math.floor(this.y);
-	});
+
+  Object.defineProperties(this, {
+    'EstimatedModuleSize': {
+      get: function () {
+        return this.estimatedModuleSize;
+      }
+    },
+
+  	"Count": {
+      get: function() {
+    		return this.count;
+      }
+  	},
+
+  	"X": {
+      get: function() {
+    		return Math.floor(this.x);
+      }
+  	},
+
+  	"Y": {
+      get: function() {
+    		return Math.floor(this.y);
+      }
+  	}
+  });
+
 	this.incrementCount = function()
 	{
 		this.count++;
@@ -59,7 +69,7 @@ function AlignmentPattern(posX, posY,  estimatedModuleSize)
 			}
 			return false;
 		}
-	
+
 }
 
 function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  moduleSize,  resultPointCallback)
@@ -73,7 +83,7 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 	this.moduleSize = moduleSize;
 	this.crossCheckStateCount = new Array(0,0,0);
 	this.resultPointCallback = resultPointCallback;
-	
+
 	this.centerFromEnd=function(stateCount,  end)
 		{
 			return  (end - stateCount[2]) - stateCount[1] / 2.0;
@@ -95,13 +105,13 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 	this.crossCheckVertical=function( startI,  centerJ,  maxCount,  originalStateCountTotal)
 		{
 			var image = this.image;
-			
+
 			var maxI = qrcode.height;
 			var stateCount = this.crossCheckStateCount;
 			stateCount[0] = 0;
 			stateCount[1] = 0;
 			stateCount[2] = 0;
-			
+
 			// Start counting up from center
 			var i = startI;
 			while (i >= 0 && image[centerJ + i*qrcode.width] && stateCount[1] <= maxCount)
@@ -123,7 +133,7 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 			{
 				return NaN;
 			}
-			
+
 			// Now also count down from center
 			i = startI + 1;
 			while (i < maxI && image[centerJ + i*qrcode.width] && stateCount[1] <= maxCount)
@@ -144,16 +154,16 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 			{
 				return NaN;
 			}
-			
+
 			var stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2];
 			if (5 * Math.abs(stateCountTotal - originalStateCountTotal) >= 2 * originalStateCountTotal)
 			{
 				return NaN;
 			}
-			
+
 			return this.foundPatternCross(stateCount)?this.centerFromEnd(stateCount, i):NaN;
 		}
-		
+
 	this.handlePossibleCenter=function( stateCount,  i,  j)
 		{
 			var stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2];
@@ -182,7 +192,7 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 			}
 			return null;
 		}
-		
+
 	this.find = function()
 	{
 			var startX = this.startX;
@@ -265,15 +275,15 @@ function AlignmentPatternFinder( image,  startX,  startY,  width,  height,  modu
 					}
 				}
 			}
-			
+
 			// Hmm, nothing we saw was observed and confirmed twice. If we had
 			// any guess at all, return it.
 			if (!(this.possibleCenters.length == 0))
 			{
 				return  this.possibleCenters[0];
 			}
-			
+
 			throw "Couldn't find enough alignment patterns";
 		}
-	
+
 }
