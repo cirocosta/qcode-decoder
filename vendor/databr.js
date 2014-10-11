@@ -281,5 +281,4 @@ function QRCodeDataBlockReader (blocks,  version,  numErrorCorrectionCode) {
 
     }
   });
-
 }

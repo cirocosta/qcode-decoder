@@ -46,6 +46,9 @@ gulp.task('build:vendor', function () {
   return gulp.src(paths.vendor)
     .pipe(sourcemaps.init())
       .pipe(concat('qrcode.js'))
+      // .pipe(uglify().on('error', function (e) {
+      //   console.log(e);
+      // }))
       .pipe(header(vendor.header))
       .pipe(footer(vendor.footer))
     .pipe(sourcemaps.write('./'))

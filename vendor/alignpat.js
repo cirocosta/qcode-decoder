@@ -33,7 +33,7 @@ function AlignmentPattern(posX, posY,  estimatedModuleSize)
   Object.defineProperties(this, {
     'EstimatedModuleSize': {
       get: function () {
-        return this.estimatedModuleSize
+        return this.estimatedModuleSize;
       }
     },
 

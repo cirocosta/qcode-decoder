@@ -58,17 +58,19 @@ function GF256Poly(field,  coefficients)
 
   Object.defineProperties(this, {
   	"Zero": {
-      get: function   {
+      get: function () {
     		return this.coefficients[0] == 0;
       }
   	},
+
   	"Degree": {
-      get: function   {
+      get: function () {
     		return this.coefficients.length - 1;
       }
   	},
+
   	"Coefficients": {
-      get: function   {
+      get: function () {
     		return this.coefficients;
       }
   	}

@@ -31,7 +31,7 @@ function ECB(count,  dataCodewords)
 
   Object.defineProperties(this, {
     'Count': {
-      get: function  () {
+      get: function () {
         return this.count;
       }
     },
