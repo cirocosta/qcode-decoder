@@ -81,6 +81,10 @@ Stops the current `qr` from searching for a QRCode.
 
 The proper use of camera APIs and, then, the use of this module, the developer needs to first initiate a webserver for running the examples. I suggest going with [http-server](https://github.com/nodeapps/http-server).
 
+## Scala.Js wrapper
+
+There is a [wrapper available](https://github.com/mkotsbak/scalajs-qcode-decoder) available for using this library with Scala.Js with a typesafe facade.
+
 ## Credits
 
 The main decoder methods are from [Lazar Laszlo](http://www.
