@@ -178,7 +178,7 @@ QCodeDecoder.prototype.decodeFromImage = function (img, cb) {
  */
 QCodeDecoder.prototype.stop = function() {
   if (this.stream) {
-    this.stream.stop();
+    this.stream.getTracks().forEach(function (track) { track.stop(); });
     this.stream = undefined;
   }
 
