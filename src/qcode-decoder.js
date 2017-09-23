@@ -129,12 +129,19 @@ QCodeDecoder.prototype._captureToCanvas = function (videoElem, cb, once) {
  */
 QCodeDecoder.prototype.decodeFromCamera = function (videoElem, cb, once) {
   var scope = (this.stop(), this);
+  var user = detect.parse(navigator.userAgent);
 
   if (!this.hasGetUserMedia())
     cb(new Error('Couldn\'t get video from camera'));
-
+  
   navigator.getUserMedia(this.videoConstraints, function (stream) {
-    videoElem.src = window.URL.createObjectURL(stream);
+    
+    if (user.browser.family === 'Firefox') { 
+        videoElem.src = window.URL.createObjectURL(stream);
+      } else {
+        videoElem.src = webkitURL.createObjectURL(stream);
+      }
+    
     scope.videoElem = videoElem;
     scope.stream = stream;
     scope.videoDimensions = false;
