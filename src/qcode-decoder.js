@@ -134,7 +134,7 @@ QCodeDecoder.prototype.decodeFromCamera = function (videoElem, cb, once) {
     cb(new Error('Couldn\'t get video from camera'));
 
   navigator.getUserMedia(this.videoConstraints, function (stream) {
-    videoElem.src = window.URL.createObjectURL(stream);
+    videoElem.srcObject = stream;
     scope.videoElem = videoElem;
     scope.stream = stream;
     scope.videoDimensions = false;
